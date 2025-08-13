@@ -26,17 +26,18 @@ const statusText = computed(() => {
 <template>
   <div class="form-card" :class="`form-card--${form.status}`">
     <h3>{{ form.title }}</h3>
-    <div class="form-card-statustext">
-      <p>Статус:</p>
-      <p>{{ statusText }}</p>
-    </div>
+    <p class="form-card-statustext">{{ statusText }}</p>
   </div>
 </template>
 
 <style scoped>
+.form-card-statustext {
+  margin-right: 30px;
+  font-weight: 800;
+}
 .form-card {
   font-family: Poppins;
-  border: 2px solid black;
+  /* border: 2px solid black; */
   border-radius: 30px;
   padding: 10px;
   padding-top: 20px;
@@ -47,21 +48,27 @@ const statusText = computed(() => {
   justify-content: space-between;
   align-items: center;
 }
-.form-card-statustext {
-  display: flex;
-  flex-direction: row;
-}
-.form-card--active .form-card-statustext p:nth-child(2) {
+.form-card--active .form-card-statustext {
   color: red;
-  margin-left: 6px;
 }
-.form-card--inprocess .form-card-statustext p:nth-child(2) {
+.form-card--active {
+  background-color: rgba(255, 0, 0, 0.275);
+  color: red;
+  box-shadow: 0 0 8px red;
+}
+.form-card--inprocess .form-card-statustext {
   color: orange;
-  margin-left: 6px;
 }
-.form-card--completed .form-card-statustext p:nth-child(2) {
+.form-card--inprocess {
+  color: red;
+  border: 1px solid red;
+}
+.form-card--completed .form-card-statustext {
   color: green;
-  margin-left: 6px;
+}
+.form-card--completed {
+  color: gray;
+  border: 1px solid gray;
 }
 .form-card:hover {
   cursor: pointer;

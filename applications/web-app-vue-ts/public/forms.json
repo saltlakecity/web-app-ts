@@ -1,5 +1,6 @@
 [
     {"id":1, "title":"Студсовет на максималках", "status":"active"},
     {"id":2, "title":"Отзыв о ...", "status":"inprocess"},
-    {"id":3, "title":"Селигер", "status":"completed"}
+    {"id":3, "title":"Селигер", "status":"completed"},
+    {"id":4, "title":"Селигер", "status":"active"}
 ]

@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Form from "./Form.vue";
-import formsData from "./forms.json";
+// import formsData from "./forms.json";
 import type { FormMeta } from "./Form.vue";
-
-const forms = ref<FormMeta[]>(formsData);
+const forms = ref<FormMeta[]>();
+onMounted(async () => {
+  const response = await fetch("/forms.json");
+  const data = await response.json();
+  forms.value = data;
+});
 </script>
 
 <template>
