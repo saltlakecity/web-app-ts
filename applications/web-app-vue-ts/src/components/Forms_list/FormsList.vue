@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import Form from "./Form.vue";
-// import formsData from "./forms.json";
 import type { FormMeta } from "./Form.vue";
+
+const emit = defineEmits(["form-selected"]);
+
 const forms = ref<FormMeta[]>();
 onMounted(async () => {
   const response = await fetch("/forms.json");
   const data = await response.json();
   forms.value = data;
 });
+
+const handleFormClick = (formId: number) => {
+  emit("form-selected", formId);
+};
 </script>
 
 <template>
@@ -16,7 +22,12 @@ onMounted(async () => {
     <span></span>
   </div>
   <div class="forms_container">
-    <Form v-for="item in forms" :key="item.id" :form="item"></Form>
+    <Form
+      v-for="item in forms"
+      :key="item.id"
+      :form="item"
+      @click="() => handleFormClick(item.id)"
+    ></Form>
   </div>
 </template>
 

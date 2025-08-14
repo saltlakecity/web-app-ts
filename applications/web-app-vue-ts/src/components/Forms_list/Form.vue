@@ -1,11 +1,7 @@
 <script setup lang="ts">
 // import formsData from "./forms.json";
 import { computed, ref } from "vue";
-export interface FormMeta {
-  id: number;
-  title: string;
-  status: string;
-}
+import type { FormMeta } from "@/types/types";
 const props = defineProps<{
   form: FormMeta;
 }>();

@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import FormsList from "./components/Forms_list/FormsList.vue";
+import FormView from "./components/form_view/FormView.vue";
+import { ref } from "vue";
+import type { FormMeta } from "@/types/types";
+
+const currentFormId = ref<number | null>(null);
+
+const handleFormSelect = (formId: number) => {
+  currentFormId.value = formId;
+};
+
+const handleBack = () => {
+  currentFormId.value = null;
+};
 </script>
 <template>
-  <!-- TODO 1. Реализовать переход в форму-->
-  <!-- TODO 2. Реализовать интерфейс формы-->
-  <!-- TODO 3. Реализовать поля в форме-->
-
   <!-- TODO 4. Инициализировать бэкэнд-->
-  <FormsList></FormsList>
+  <FormsList
+    v-if="!currentFormId"
+    @form-selected="handleFormSelect"
+  ></FormsList>
+  <FormView v-else :form-id="currentFormId" @back="handleBack" />
 </template>
 
 <style scoped></style>
