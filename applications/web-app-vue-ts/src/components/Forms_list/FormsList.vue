@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import Form from "./Form.vue";
-import type { FormMeta } from "./Form.vue";
+import type { FormMeta, FormField } from "@/types/types";
+import { apiClient } from "@/api/api";
 
 const emit = defineEmits(["form-selected"]);
 
 const forms = ref<FormMeta[]>();
 onMounted(async () => {
-  const response = await fetch("/forms.json");
-  const data = await response.json();
-  forms.value = data;
+  forms.value = await apiClient.getForms();
 });
 
 const handleFormClick = (formId: number) => {

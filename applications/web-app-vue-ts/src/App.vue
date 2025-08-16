@@ -2,7 +2,7 @@
 import FormsList from "./components/Forms_list/FormsList.vue";
 import FormView from "./components/form_view/FormView.vue";
 import { ref } from "vue";
-import type { FormMeta } from "@/types/types";
+import type { FormMeta, FormField } from "@/types/types";
 
 const currentFormId = ref<number | null>(null);
 
@@ -15,7 +15,8 @@ const handleBack = () => {
 };
 </script>
 <template>
-  <!-- TODO 4. Инициализировать бэкэнд-->
+  <!-- TODO 3. Переписать логику форм на postgres, таблицы через directus-->
+
   <FormsList
     v-if="!currentFormId"
     @form-selected="handleFormSelect"

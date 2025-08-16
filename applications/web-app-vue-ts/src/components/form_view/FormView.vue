@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { apiClient } from "@/api/api";
+import type { FormMeta, FormField } from "@/types/types";
 const props = defineProps<{
   formId: number;
 }>();
@@ -8,14 +10,11 @@ const fields = ref<FormField[]>([]);
 const formTitle = ref("");
 
 onMounted(async () => {
-  const formsResponse = await fetch("/forms.json");
-  const formsData = await formsResponse.json();
-  const currentForm = formsData.find((form: any) => form.id === props.formId);
-
+  const forms = await apiClient.getForms(); // Используем Axios
+  const currentForm = forms.find((form) => form.id === props.formId);
   formTitle.value = currentForm?.title || "";
-  const fieldsResponse = await fetch("/formfields.json");
-  const fieldsData = await fieldsResponse.json();
-  fields.value = fieldsData[props.formId] || [];
+
+  fields.value = await apiClient.getFormFields(props.formId); // Используем Axios
 });
 
 const handleBack = () => {

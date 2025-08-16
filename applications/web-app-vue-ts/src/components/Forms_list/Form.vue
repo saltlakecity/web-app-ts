@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// import formsData from "./forms.json";
 import { computed, ref } from "vue";
 import type { FormMeta } from "@/types/types";
+import { apiClient } from "@/api/api"; // Импортируем API клиент
 const props = defineProps<{
   form: FormMeta;
 }>();
