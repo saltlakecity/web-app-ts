@@ -10,11 +10,11 @@ const fields = ref<FormField[]>([]);
 const formTitle = ref("");
 
 onMounted(async () => {
-  const forms = await apiClient.getForms(); // Используем Axios
+  const forms = await apiClient.getForms();
   const currentForm = forms.find((form) => form.id === props.formId);
   formTitle.value = currentForm?.title || "";
 
-  fields.value = await apiClient.getFormFields(props.formId); // Используем Axios
+  fields.value = await apiClient.getFormFields(props.formId);
 });
 
 const handleBack = () => {
