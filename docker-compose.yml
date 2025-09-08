@@ -34,14 +34,15 @@ services:
     build:
       context: ./applications/web-app-vue-ts
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: "/api"
     environment:
+      # можно оставить для dev; но главное — ARG выше для сборки
       VITE_API_URL: /api
     ports:
       - "80:80"
     depends_on:
       - backend
-    restart: unless-stopped
-    # добавляем хоткод для разработки
     volumes:
       - ./applications/web-app-vue-ts/src:/app/src
 

@@ -7,11 +7,17 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "@trpc/server": "^10.0.0",
-    "pg": "^8.11.3",
-    "dotenv": "^16.3.1"
+    "@trpc/server": "^10.45.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^20.5.1",
     "@types/pg": "^8.10.2",
     "typescript": "^5.1.6"

@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { FormMeta } from "@/types/types";
+
 const props = defineProps<{
   form: FormMeta;
 }>();
+
+const emit = defineEmits(["select"]);
+
 const statusText = computed(() => {
   switch (props.form.status) {
     case "completed":
@@ -19,7 +23,12 @@ const statusText = computed(() => {
 </script>
 
 <template>
-  <div class="form-card" :class="`form-card--${form.status}`">
+  <!-- корневой элемент ловит клик и эмитит событие select -->
+  <div
+    class="form-card"
+    :class="`form-card--${form.status}`"
+    @click="$emit('select')"
+  >
     <h3>{{ form.title }}</h3>
     <p class="form-card-statustext">{{ statusText }}</p>
   </div>
@@ -32,7 +41,6 @@ const statusText = computed(() => {
 }
 .form-card {
   font-family: Poppins;
-  /* border: 2px solid black; */
   border-radius: 30px;
   padding: 10px;
   padding-top: 20px;
@@ -67,5 +75,7 @@ const statusText = computed(() => {
 }
 .form-card:hover {
   cursor: pointer;
+  transform: translateY(-2px);
+  transition: transform 120ms ease;
 }
 </style>
