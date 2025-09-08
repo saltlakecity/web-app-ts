@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { apiClient } from "@/api/api";
-import type { FormMeta, FormField } from "@/types/types";
+import type { FormField } from "@/types/types";
 const props = defineProps<{
   formId: number;
 }>();

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import Form from "./Form.vue";
-import type { FormMeta, FormField } from "@/types/types";
+import type { FormMeta} from "@/types/types";
 import { apiClient } from "@/api/api";
 
 const emit = defineEmits(["form-selected"]);

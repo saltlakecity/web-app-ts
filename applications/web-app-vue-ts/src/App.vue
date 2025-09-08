@@ -2,7 +2,6 @@
 import FormsList from "./components/Forms_list/FormsList.vue";
 import FormView from "./components/form_view/FormView.vue";
 import { ref } from "vue";
-import type { FormMeta, FormField } from "@/types/types";
 
 const currentFormId = ref<number | null>(null);
 
