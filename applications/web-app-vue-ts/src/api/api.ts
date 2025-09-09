@@ -40,6 +40,13 @@ class ApiClient {
     const response = await api.get<FormField[]>(`/formfields/${formId}`);
     return response.data;
   }
+  async postFormResponse(
+    formId: number,
+    answers: { fieldId: string; value: string | null }[]
+  ) {
+    const response = await api.post(`/forms/${formId}/responses`, { answers });
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
