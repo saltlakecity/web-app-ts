@@ -1,13 +1,11 @@
-import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 import { pool } from "../db";
 import { 
   FormMetaSchema, 
   FormFieldSchema, 
   FormResponseSchema 
-} from "../schemas";
-
-const t = initTRPC.create();
+} from "../../shared/schemas";
+import { router, protectedProcedure } from "../middleware/auth";
 
 async function fetchForms() {
   const res = await pool.query(
@@ -25,15 +23,13 @@ async function fetchFormFields(formId: number) {
 }
 
 /**
- * Сохраняет ответ на форму.
- * @param formId - id формы
- * @param answers - массив { fieldId: string, value: string }
+ * Сохраняет ответ на форму с авторизацией пользователя.
  * Возвращает id созданного response
  */
 export async function saveResponse(
   formId: number,
   answers: { fieldId: string; value: string | null }[],
-  responderId?: string | null
+  userId: number
 ) {
   const client = await pool.connect();
   try {
@@ -67,10 +63,10 @@ export async function saveResponse(
 
     await client.query("BEGIN");
 
-    // Вставка ответа
+    // Вставка ответа с привязкой к пользователю
     const insertResp = await client.query(
       "INSERT INTO responses (form_id, created_at, responder_id) VALUES ($1, now(), $2) RETURNING id",
-      [formId, responderId ?? null]
+      [formId, userId.toString()]
     );
     const responseId = insertResp.rows[0].id;
 
@@ -94,44 +90,58 @@ export async function saveResponse(
   }
 }
 
-export const formsRouter = t.router({
-  // Получение всех форм
-  getForms: t.procedure
+export const formsRouter = router({
+  // Получение всех форм (защищенное)
+  getForms: protectedProcedure
     .output(FormMetaSchema.array())
     .query(async () => {
       return await fetchForms();
     }),
 
-  // Получение полей формы
-  getFormFields: t.procedure
+  // Получение полей формы (защищенное)
+  getFormFields: protectedProcedure
     .input(FormFieldSchema.shape.id)
     .output(FormFieldSchema.array())
     .query(async ({ input: formId }) => {
       return await fetchFormFields(formId);
     }),
 
-  // Сохранение ответа на форму
-  saveFormResponse: t.procedure
+  // Сохранение ответа на форму (защищенное)
+  saveFormResponse: protectedProcedure
     .input(FormResponseSchema)
     .output(z.object({
       success: z.boolean(),
       responseId: z.number(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const responseId = await saveResponse(
         input.formId,
         input.answers,
-        input.responderId
+        ctx.user.userId
       );
       return {
         success: true,
         responseId,
       };
     }),
-});
 
-export const services = {
-  fetchForms,
-  fetchFormFields,
-  saveResponse,
-};
+  // Получение ответов пользователя на формы
+  getUserResponses: protectedProcedure
+    .output(z.array(z.object({
+      id: z.number(),
+      form_id: z.number(),
+      form_title: z.string(),
+      created_at: z.string(),
+    })))
+    .query(async ({ ctx }) => {
+      const res = await pool.query(`
+        SELECT r.id, r.form_id, f.title as form_title, r.created_at
+        FROM responses r
+        JOIN forms f ON r.form_id = f.id
+        WHERE r.responder_id = $1
+        ORDER BY r.created_at DESC
+      `, [ctx.user.userId.toString()]);
+      
+      return res.rows;
+    }),
+});

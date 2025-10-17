@@ -35,13 +35,7 @@ export default defineNuxtConfig({
   },
   
   // Настройки для работы с модулями
-  modules: [],
-  
-  // Настройки для работы с компонентами
-  components: [
-    {
-      path: '~/components',
-      pathPrefix: false,
-    }
+  modules: [
+    '@pinia/nuxt',
   ]
 })

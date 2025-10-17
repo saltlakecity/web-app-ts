@@ -1,87 +1,69 @@
-import { ref, computed } from 'vue';
-import { trpcApiClient } from '../lib/trpc-api';
-import type { FormMeta, FormField } from '@studsovet/server/shared';
+import type { FormMeta, FormField } from '@studsovet/server/shared'
 
 export function useForms() {
-  const forms = ref<FormMeta[]>([]);
-  const formFields = ref<FormField[]>([]);
-  const isLoading = ref(false);
-  const error = ref<string | null>(null);
+  const api = useApi()
 
-  // Computed для получения форм
-  const formsList = computed(() => forms.value);
-
-  // Computed для получения полей формы
-  const fieldsList = computed(() => formFields.value);
-
-  // Загрузка всех форм
-  const fetchForms = async () => {
-    isLoading.value = true;
-    error.value = null;
-    
-    try {
-      forms.value = await trpcApiClient.getForms();
-      console.log('✅ Формы загружены:', forms.value);
-    } catch (err: any) {
-      console.error('❌ Ошибка загрузки форм:', err);
-      error.value = err.message || 'Ошибка загрузки форм';
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  // Загрузка полей формы
-  const fetchFormFields = async (formId: number) => {
-    isLoading.value = true;
-    error.value = null;
-    
-    try {
-      formFields.value = await trpcApiClient.getFormFields(formId);
-      console.log('✅ Поля формы загружены:', formFields.value);
-    } catch (err: any) {
-      console.error('❌ Ошибка загрузки полей формы:', err);
-      error.value = err.message || 'Ошибка загрузки полей формы';
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  // Отправка ответа на форму
-  const submitFormResponse = async (
-    formId: number,
-    answers: { fieldId: string; value: string | null }[],
-    responderId?: string
-  ) => {
-    isLoading.value = true;
-    error.value = null;
-    
-    try {
-      const result = await trpcApiClient.postFormResponse(formId, answers, responderId);
-      console.log('✅ Ответ отправлен:', result);
-      return result;
-    } catch (err: any) {
-      console.error('❌ Ошибка отправки ответа:', err);
-      error.value = err.message || 'Ошибка отправки ответа';
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  };
+  const { data: forms, pending: formsLoading, error: formsError, refresh: fetchForms } = useLazyAsyncData(
+    'forms',
+    () => api.getForms(),
+    { default: () => [] }
+  )
 
   return {
-    // Состояние
     forms,
-    formFields,
-    isLoading,
-    error,
-    
-    // Computed
-    formsList,
-    fieldsList,
-    
-    // Методы
+    isLoading: formsLoading,
+    error: formsError,
     fetchForms,
+  }
+}
+
+export function useFormFields(formId: Ref<number>) {
+  const api = useApi()
+  const key = computed(() => `form-fields-${formId.value}`)
+
+  const { data: formFields, pending: fieldsLoading, error: fieldsError, refresh: fetchFormFields } = useLazyAsyncData(
+    key,
+    () => api.getFormFields(formId.value),
+    { 
+      default: () => [],
+      watch: [formId]
+    }
+  )
+
+  return {
+    formFields,
+    isLoading: fieldsLoading,
+    error: fieldsError,
     fetchFormFields,
-    submitFormResponse
-  };
+  }
+}
+
+export function useFormSubmit() {
+  const api = useApi()
+  const isSubmitting = ref(false)
+  const submitError = ref<string | null>(null)
+
+  const submitFormResponse = async (
+    formId: number,
+    answers: { fieldId: string; value: string | null }[]
+  ) => {
+    isSubmitting.value = true
+    submitError.value = null
+
+    try {
+      const result = await api.postFormResponse(formId, answers)
+      return result
+    } catch (err: any) {
+      submitError.value = err.message || 'Ошибка отправки ответа'
+      throw err
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  return {
+    submitFormResponse,
+    isSubmitting,
+    submitError,
+  }
 }

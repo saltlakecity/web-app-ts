@@ -55,6 +55,33 @@ export const TelegramValidationResponseSchema = z.object({
 });
 export type TelegramValidationResponse = z.infer<typeof TelegramValidationResponseSchema>;
 
+// JWT схемы
+export const JWTPayloadSchema = z.object({
+  userId: z.number(),
+  username: z.string().optional(),
+  firstName: z.string(),
+  lastName: z.string().optional(),
+  iat: z.number().optional(),
+  exp: z.number().optional(),
+});
+export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
+
+export const JWTResponseSchema = z.object({
+  token: z.string(),
+  expiresIn: z.number(),
+});
+export type JWTResponse = z.infer<typeof JWTResponseSchema>;
+
+export const TelegramAuthResponseSchema = z.object({
+  success: z.boolean(),
+  user: TelegramUserSchema,
+  auth_date: z.number(),
+  chat_instance: z.string().optional(),
+  chat_type: z.string().optional(),
+  jwt: JWTResponseSchema,
+});
+export type TelegramAuthResponse = z.infer<typeof TelegramAuthResponseSchema>;
+
 // Схемы для API ответов
 export const ApiResponseSchema = z.object({
   success: z.boolean(),

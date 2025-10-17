@@ -1,19 +1,26 @@
-import { createTRPCClient, httpLink } from '@trpc/client';
-import type { AppRouter } from '@studsovet/server/shared';
+import { createTRPCClient, httpLink } from '@trpc/client'
+import type { AppRouter } from '@studsovet/server/shared'
+import { useAuthStore } from '~/stores/auth'
 
-// Создаем tRPC клиент без строгой типизации для совместимости
-export const trpc = createTRPCClient<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/trpc',
-      // Настройки для запросов
-      headers() {
-        return {
-          'Content-Type': 'application/json',
-        };
-      },
-    }),
-  ],
-});
+function createTRPCClientWithToken() {
+  return createTRPCClient<AppRouter>({
+    links: [
+      httpLink({
+        url: '/api/trpc',
+        headers() {
+          const authStore = useAuthStore()
+          const token = authStore.jwtToken
+          
+          return {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          }
+        },
+      }),
+    ],
+  })
+}
 
-export default trpc;
+export const trpc = createTRPCClientWithToken()
+
+export default trpc

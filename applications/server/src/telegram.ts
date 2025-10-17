@@ -1,14 +1,5 @@
 import crypto from 'crypto';
-
-export interface TelegramUser {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-  is_premium?: boolean;
-  photo_url?: string;
-}
+import type { TelegramUser } from '../shared/schemas';
 
 export interface TelegramInitData {
   user: TelegramUser;
@@ -20,8 +11,6 @@ export interface TelegramInitData {
 
 /**
  * Валидирует initData от Telegram Mini App
- * @param initData - строка initData от Telegram
- * @param botToken - токен бота
  * @returns валидированные данные или null если невалидно
  */
 export function validateTelegramInitData(

@@ -1,12 +1,19 @@
 import express from "express";
 import cors from "cors";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { appRouter } from "./router";
 import { pool } from "./db";
 
 const app = express();
 app.use(cors());
 
+// Создание контекста для tRPC с типизацией
+export function createContext({ req, res }: CreateExpressContextOptions) {
+  return { req, res };
+}
+
+export type Context = Awaited<ReturnType<typeof createContext>>;
 
 // Health-check
 app.get("/api/health", (req, res) => {
@@ -18,7 +25,7 @@ app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext: () => ({}),
+    createContext,
     onError: ({ error, path, input }) => {
       console.error(`❌ tRPC Error on ${path}:`, error);
       console.error('Input:', input);

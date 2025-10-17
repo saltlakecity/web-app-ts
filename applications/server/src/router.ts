@@ -1,10 +1,9 @@
-import { initTRPC } from "@trpc/server";
+import { router } from "./middleware/auth";
 import { formsRouter } from "./handlers/forms";
 import { telegramRouter } from "./handlers/telegram";
 
-const t = initTRPC.create();
-
-export const appRouter = t.router({
+export const appRouter = router({
+  // Все роуты теперь защищены JWT авторизацией
   forms: formsRouter,
   telegram: telegramRouter,
 });
