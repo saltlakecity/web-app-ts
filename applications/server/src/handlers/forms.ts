@@ -7,16 +7,32 @@ import {
 } from "../../shared/schemas";
 import { router, protectedProcedure } from "../middleware/auth";
 
-async function fetchForms() {
-  const res = await pool.query(
+async function fetchForms(userId: number) {
+  // Получаем все формы
+  const formsRes = await pool.query(
     "SELECT id, title, status FROM forms ORDER BY id"
   );
-  return res.rows;
+
+  // Получаем ID форм, на которые уже отвечал пользователь
+  const userResponsesRes = await pool.query(
+    "SELECT DISTINCT form_id FROM responses WHERE responder_id = $1",
+    [userId.toString()]
+  );
+
+  const completedFormIds = new Set(userResponsesRes.rows.map(r => r.form_id));
+
+  // Добавляем статус прохождения для каждой формы
+  const forms = formsRes.rows.map(form => ({
+    ...form,
+    user_status: completedFormIds.has(form.id) ? 'completed' : 'not_completed'
+  }));
+
+  return forms;
 }
 
 async function fetchFormFields(formId: number) {
   const res = await pool.query(
-    "SELECT id, form_id, type, label, required FROM form_fields WHERE form_id = $1 ORDER BY id",
+    "SELECT id, form_id, field_type as type, field_label as label, is_required as required FROM form_fields WHERE form_id = $1 ORDER BY position, id",
     [formId]
   );
   return res.rows;
@@ -34,7 +50,7 @@ export async function saveResponse(
   const client = await pool.connect();
   try {
     const { rows: allowedFields } = await client.query(
-      "SELECT id, required FROM form_fields WHERE form_id = $1",
+      "SELECT id, is_required as required FROM form_fields WHERE form_id = $1",
       [formId]
     );
     const allowedMap = new Map<string, { required: boolean }>();
@@ -63,6 +79,16 @@ export async function saveResponse(
 
     await client.query("BEGIN");
 
+    // Проверяем, не отвечал ли уже пользователь на эту форму
+    const existingResponse = await client.query(
+      "SELECT id FROM responses WHERE form_id = $1 AND responder_id = $2",
+      [formId, userId.toString()]
+    );
+
+    if (existingResponse.rows.length > 0) {
+      throw new Error('Вы уже отвечали на эту форму');
+    }
+
     // Вставка ответа с привязкой к пользователю
     const insertResp = await client.query(
       "INSERT INTO responses (form_id, created_at, responder_id) VALUES ($1, now(), $2) RETURNING id",
@@ -70,14 +96,19 @@ export async function saveResponse(
     );
     const responseId = insertResp.rows[0].id;
 
+    // Проверяем, что ответ успешно создан
+    if (!responseId) {
+      throw new Error('Failed to create response record');
+    }
+
     const insertText =
-      "INSERT INTO response_fields (response_id, field_id, value) VALUES ($1, $2, $3)";
+      "INSERT INTO response_fields (response_id, field_id, value, responder_id) VALUES ($1, $2, $3, $4)";
     for (const a of answers) {
       const value =
         a.value === null || a.value === undefined
           ? null
           : String(a.value).slice(0, 10000);
-      await client.query(insertText, [responseId, a.fieldId, value]);
+      await client.query(insertText, [responseId, a.fieldId, value, userId.toString()]);
     }
 
     await client.query("COMMIT");
@@ -94,8 +125,8 @@ export const formsRouter = router({
   // Получение всех форм (защищенное)
   getForms: protectedProcedure
     .output(FormMetaSchema.array())
-    .query(async () => {
-      return await fetchForms();
+    .query(async ({ ctx }) => {
+      return await fetchForms(ctx.user.userId);
     }),
 
   // Получение полей формы (защищенное)
