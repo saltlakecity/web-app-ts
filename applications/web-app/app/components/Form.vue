@@ -9,6 +9,12 @@ const props = defineProps<{
 defineEmits(['select'])
 
 const statusText = computed(() => {
+  // Приоритет отдается user_status (статус прохождения)
+  if (props.form.user_status === 'completed') {
+    return 'Пройден'
+  }
+
+  // Fallback к общему статусу формы
   const statusMap: Record<string, string> = {
     completed: 'Выполнено',
     inprocess: 'В процессе',
@@ -21,8 +27,11 @@ const statusText = computed(() => {
 <template>
   <div
     class="form-card"
-    :class="`form-card--${form.status}`"
-    @click="$emit('select')"
+    :class="[
+      `form-card--${form.status}`,
+      form.user_status === 'completed' ? 'form-card--completed' : ''
+    ]"
+    @click="form.user_status !== 'completed' && $emit('select')"
   >
     <h3 class="form-card__title">{{ form.title }}</h3>
     <p class="form-card__status">{{ statusText }}</p>
@@ -77,12 +86,17 @@ const statusText = computed(() => {
   }
 
   &--completed {
-    color: $color-gray;
-    border: 1px solid $color-gray;
+    background-color: rgba($color-error, 0.1);
+    color: $color-error;
+    border: 1px solid $color-error;
+    cursor: not-allowed;
+    opacity: 0.7;
 
     .form-card__status {
-      color: $color-form-completed;
+      color: $color-error;
+      font-weight: 600;
     }
   }
+
 }
 </style>

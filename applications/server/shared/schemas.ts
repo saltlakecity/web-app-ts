@@ -7,6 +7,7 @@ export const FormMetaSchema = z.object({
   id: z.number(),
   title: z.string(),
   status: z.string().optional(),
+  user_status: z.string().optional(), // completed, not_completed
 });
 export type FormMeta = z.infer<typeof FormMetaSchema>;
 
