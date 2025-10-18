@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { pool } from "../db";
-import { 
-  FormMetaSchema, 
-  FormFieldSchema, 
-  FormResponseSchema 
+import {
+  FormMetaSchema,
+  FormFieldSchema,
+  FormResponseSchema,
 } from "../../shared/schemas";
 import { router, protectedProcedure } from "../middleware/auth";
 
@@ -19,12 +19,12 @@ async function fetchForms(userId: number) {
     [userId.toString()]
   );
 
-  const completedFormIds = new Set(userResponsesRes.rows.map(r => r.form_id));
+  const completedFormIds = new Set(userResponsesRes.rows.map((r) => r.form_id));
 
   // Добавляем статус прохождения для каждой формы
-  const forms = formsRes.rows.map(form => ({
+  const forms = formsRes.rows.map((form) => ({
     ...form,
-    user_status: completedFormIds.has(form.id) ? 'completed' : 'not_completed'
+    user_status: completedFormIds.has(form.id) ? "completed" : "not_completed",
   }));
 
   return forms;
@@ -36,6 +36,33 @@ async function fetchFormFields(formId: number) {
     [formId]
   );
   return res.rows;
+}
+
+async function fetchFormMeta(formId: number, userId: number) {
+  const res = await pool.query(
+    "SELECT id, title, status FROM forms WHERE id = $1",
+    [formId]
+  );
+
+  if (res.rows.length === 0) {
+    throw new Error("Form not found");
+  }
+
+  const form = res.rows[0];
+
+  // Проверяем, отвечал ли пользователь на эту форму
+  const userResponseRes = await pool.query(
+    "SELECT id FROM responses WHERE form_id = $1 AND responder_id = $2",
+    [formId, userId.toString()]
+  );
+
+  const user_status =
+    userResponseRes.rows.length > 0 ? "completed" : "not_completed";
+
+  return {
+    ...form,
+    user_status,
+  };
 }
 
 /**
@@ -86,7 +113,7 @@ export async function saveResponse(
     );
 
     if (existingResponse.rows.length > 0) {
-      throw new Error('Вы уже отвечали на эту форму');
+      throw new Error("Вы уже отвечали на эту форму");
     }
 
     // Вставка ответа с привязкой к пользователю
@@ -98,7 +125,7 @@ export async function saveResponse(
 
     // Проверяем, что ответ успешно создан
     if (!responseId) {
-      throw new Error('Failed to create response record');
+      throw new Error("Failed to create response record");
     }
 
     const insertText =
@@ -108,7 +135,12 @@ export async function saveResponse(
         a.value === null || a.value === undefined
           ? null
           : String(a.value).slice(0, 10000);
-      await client.query(insertText, [responseId, a.fieldId, value, userId.toString()]);
+      await client.query(insertText, [
+        responseId,
+        a.fieldId,
+        value,
+        userId.toString(),
+      ]);
     }
 
     await client.query("COMMIT");
@@ -137,13 +169,23 @@ export const formsRouter = router({
       return await fetchFormFields(formId);
     }),
 
+  // Получение метаданных формы (защищенное)
+  getFormMeta: protectedProcedure
+    .input(FormFieldSchema.shape.id)
+    .output(FormMetaSchema)
+    .query(async ({ input: formId, ctx }) => {
+      return await fetchFormMeta(formId, ctx.user.userId);
+    }),
+
   // Сохранение ответа на форму (защищенное)
   saveFormResponse: protectedProcedure
     .input(FormResponseSchema)
-    .output(z.object({
-      success: z.boolean(),
-      responseId: z.number(),
-    }))
+    .output(
+      z.object({
+        success: z.boolean(),
+        responseId: z.number(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       const responseId = await saveResponse(
         input.formId,
@@ -158,21 +200,28 @@ export const formsRouter = router({
 
   // Получение ответов пользователя на формы
   getUserResponses: protectedProcedure
-    .output(z.array(z.object({
-      id: z.number(),
-      form_id: z.number(),
-      form_title: z.string(),
-      created_at: z.string(),
-    })))
+    .output(
+      z.array(
+        z.object({
+          id: z.number(),
+          form_id: z.number(),
+          form_title: z.string(),
+          created_at: z.string(),
+        })
+      )
+    )
     .query(async ({ ctx }) => {
-      const res = await pool.query(`
+      const res = await pool.query(
+        `
         SELECT r.id, r.form_id, f.title as form_title, r.created_at
         FROM responses r
         JOIN forms f ON r.form_id = f.id
         WHERE r.responder_id = $1
         ORDER BY r.created_at DESC
-      `, [ctx.user.userId.toString()]);
-      
+      `,
+        [ctx.user.userId.toString()]
+      );
+
       return res.rows;
     }),
 });
