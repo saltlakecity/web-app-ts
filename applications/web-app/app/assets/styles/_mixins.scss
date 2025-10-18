@@ -1,0 +1,95 @@
+@use "sass:color";
+@use './variables' as *;
+
+// Центрирование контента
+@mixin center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Ограничение ширины контента
+@mixin content-container($max-width: $max-width-content) {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: $spacing-base;
+  box-sizing: border-box;
+}
+
+// Truncate text с троеточием
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Кнопка с состояниями
+@mixin button-base {
+  padding: $spacing-md $spacing-xl;
+  border: none;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color $transition-base, opacity $transition-base;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Карточка с тенью
+@mixin card {
+  background: white;
+  border-radius: $border-radius-md;
+  padding: $spacing-base;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Сообщение (информация, успех, ошибка)
+@mixin message($color, $bg-color) {
+  padding: $spacing-md $spacing-base;
+  border-radius: $border-radius-sm;
+  margin-top: $spacing-xs;
+  color: $color;
+  background-color: $bg-color;
+  font-weight: 500;
+}
+
+// Состояние загрузки
+@mixin loading-state {
+  text-align: center;
+  padding: $spacing-lg;
+  color: $color-text-secondary;
+}
+
+// Прозрачная кнопка
+@mixin button-transparent {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity $transition-base;
+  
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+// Респонсивность
+@mixin responsive($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: $breakpoint-mobile) {
+      @content;
+    }
+  } @else if $breakpoint == tablet {
+    @media (max-width: $breakpoint-tablet) {
+      @content;
+    }
+  } @else if $breakpoint == desktop {
+    @media (min-width: $breakpoint-desktop) {
+      @content;
+    }
+  }
+}
+

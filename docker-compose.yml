@@ -14,6 +14,7 @@ services:
       retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./applications/server/migrations:/docker-entrypoint-initdb.d
   backend:
     build:
       context: ./applications/server
@@ -25,26 +26,37 @@ services:
       DB_PORT: 5432
       DB_NAME: mydb
       PORT: 3000
+      BOT_TOKEN: ${BOT_TOKEN}
     ports:
       - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
-  frontend:
+  telegram-bot:
     build:
-      context: ./applications/web-app-vue-ts
+      context: ./applications/telegram-bot
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: "/api"
     environment:
-      # можно оставить для dev; но главное — ARG выше для сборки
-      VITE_API_URL: /api
-    ports:
-      - "80:80"
+      BOT_TOKEN: ${BOT_TOKEN}
+      MINI_APP_URL: ${MINI_APP_URL}
+      NODE_ENV: production
     depends_on:
       - backend
-    volumes:
-      - ./applications/web-app-vue-ts/src:/app/src
+  # frontend:
+  #   build:
+  #     context: ./applications/web-app-vue-ts
+  #     dockerfile: Dockerfile
+  #     args:
+  #       VITE_API_URL: "/api"
+  #   environment:
+  #     # можно оставить для dev; но главное — ARG выше для сборки
+  #     VITE_API_URL: /api
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ./applications/web-app-vue-ts/src:/app/src
 
 volumes:
   postgres_data:
