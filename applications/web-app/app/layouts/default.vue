@@ -1,12 +1,7 @@
 <script setup lang="ts">
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
-const {
-  isAuthenticated,
-  user,
-  authError,
-  isLoading,
-} = storeToRefs(authStore)
+const { isAuthenticated, user, authError, isLoading } = storeToRefs(authStore);
 </script>
 
 <template>
@@ -14,16 +9,16 @@ const {
     <div v-if="isLoading" class="layout-state layout-state--loading">
       🔄 Инициализация авторизации...
     </div>
-    
+
     <div v-else-if="authError" class="layout-state layout-state--error">
       ❌ Ошибка: {{ authError }}
     </div>
-    
+
     <div v-else-if="isAuthenticated" class="layout__content">
       <UserBanner v-if="user" />
       <NuxtPage />
     </div>
-    
+
     <div v-else class="layout-state layout-state--error">
       ❌ Не удалось авторизоваться
     </div>
@@ -31,14 +26,18 @@ const {
 </template>
 
 <style lang="scss" scoped>
-@use '~/assets/styles/variables' as *;
+@use "~/assets/styles/variables" as *;
 
 .layout {
   min-height: 100vh;
+  width: 100vw;
+  margin: 0px;
+  padding: 0px;
 
   &__content {
     display: flex;
     flex-direction: column;
+    width: 100%;
   }
 }
 
@@ -59,4 +58,3 @@ const {
   }
 }
 </style>
-

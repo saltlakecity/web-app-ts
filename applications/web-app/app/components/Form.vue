@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import type { FormMetaSchema } from '@studsovet/server/shared'
-import { z } from 'zod'
+import type { FormMetaSchema } from "@studsovet/server/shared";
+import { z } from "zod";
 
 const props = defineProps<{
-  form: z.infer<typeof FormMetaSchema>
-}>()
+  form: z.infer<typeof FormMetaSchema>;
+}>();
 
-defineEmits(['select'])
+defineEmits(["select"]);
 
 const statusText = computed(() => {
   // Приоритет отдается user_status (статус прохождения)
-  if (props.form.user_status === 'completed') {
-    return 'Пройден'
+  if (props.form.user_status === "completed") {
+    return "Пройден";
   }
 
   // Fallback к общему статусу формы
   const statusMap: Record<string, string> = {
-    completed: 'Выполнено',
-    inprocess: 'В процессе',
-    active: 'Активно',
-  }
-  return props.form.status ? statusMap[props.form.status] || '' : ''
-})
+    completed: "Выполнено",
+    inprocess: "В процессе",
+    active: "Активно",
+  };
+  return props.form.status ? statusMap[props.form.status] || "" : "";
+});
 </script>
 
 <template>
@@ -29,7 +29,7 @@ const statusText = computed(() => {
     class="form-card"
     :class="[
       `form-card--${form.status}`,
-      form.user_status === 'completed' ? 'form-card--completed' : ''
+      form.user_status === 'completed' ? 'form-card--completed' : '',
     ]"
     @click="form.user_status !== 'completed' && $emit('select')"
   >
@@ -39,10 +39,10 @@ const statusText = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-@use '~/assets/styles/variables' as *;
+@use "~/assets/styles/variables" as *;
 
 .form-card {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Montserrat", sans-serif;
   border-radius: $border-radius-xl;
   padding: $spacing-lg $spacing-md;
   margin-top: $spacing-lg;
@@ -51,6 +51,7 @@ const statusText = computed(() => {
   align-items: center;
   cursor: pointer;
   transition: transform $transition-fast ease;
+  font-size: 12px;
 
   &:hover {
     transform: translateY(-2px);
@@ -97,6 +98,5 @@ const statusText = computed(() => {
       font-weight: 600;
     }
   }
-
 }
 </style>

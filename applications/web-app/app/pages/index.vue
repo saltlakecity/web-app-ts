@@ -1,16 +1,15 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
-})
+  layout: "default",
+});
 
-const router = useRouter()
+const router = useRouter();
 
 const handleFormSelect = (formId: number) => {
-  router.push(`/forms/${formId}`)
-}
+  router.push(`/forms/${formId}`);
+};
 </script>
 
 <template>
   <FormsList @form-selected="handleFormSelect" />
 </template>
-

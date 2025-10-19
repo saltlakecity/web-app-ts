@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import Form from './Form.vue'
+import Form from "./Form.vue";
 
-const emit = defineEmits(['form-selected'])
+const emit = defineEmits(["form-selected"]);
 
-const { forms, isLoading, error } = useForms()
+const { forms, isLoading, error } = useForms();
 
-const handleFormClick = (formId: number) => emit('form-selected', formId)
+const handleFormClick = (formId: number) => emit("form-selected", formId);
 </script>
 
 <template>
   <div class="forms-page">
-    <div class="forms-page__header"></div>
+    <div class="forms-page__header">
+      <h1 class="forms-page__header_text">Студформы</h1>
+    </div>
 
     <div class="forms-page__container">
-      <div v-if="isLoading" class="forms-page__loading">
-        Загрузка форм...
-      </div>
-      <div v-else-if="error" class="forms-page__message forms-page__message--error">
+      <div v-if="isLoading" class="forms-page__loading">Загрузка форм...</div>
+      <div
+        v-else-if="error"
+        class="forms-page__message forms-page__message--error"
+      >
         {{ error }}
       </div>
       <div v-else class="forms-page__list">
@@ -26,7 +29,10 @@ const handleFormClick = (formId: number) => emit('form-selected', formId)
           :form="item"
           @select="() => handleFormClick(item.id)"
         />
-        <div v-if="forms.length === 0" class="forms-page__message forms-page__message--empty">
+        <div
+          v-if="forms.length === 0"
+          class="forms-page__message forms-page__message--empty"
+        >
           Форм не найдено
         </div>
       </div>
@@ -35,25 +41,34 @@ const handleFormClick = (formId: number) => emit('form-selected', formId)
 </template>
 
 <style lang="scss" scoped>
-@use '~/assets/styles/variables' as *;
-@use '~/assets/styles/mixins' as *;
+@use "~/assets/styles/variables" as *;
+@use "~/assets/styles/mixins" as *;
 
 .forms-page {
   position: relative;
   min-height: 100vh;
-
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  width: 100%;
   &__header {
     position: absolute;
-    left: 0;
     top: 0;
     width: 100%;
     height: $header-height;
-    background-image: url('/Top.png');
+    background-color: #cc1d23;
+    // background-image: url("/Top.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    display: flex;
+    justify-content: center;
   }
-
+  &__header_text {
+    color: white;
+    align-self: center;
+    font-family: "MyFont", sans-serif;
+  }
   &__container {
     display: flex;
     flex-direction: column;

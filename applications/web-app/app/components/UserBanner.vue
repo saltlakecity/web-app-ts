@@ -1,13 +1,13 @@
 <script setup lang="ts">
-const authStore = useAuthStore()
-const { user, userId } = storeToRefs(authStore)
+const authStore = useAuthStore();
+const { user, userId } = storeToRefs(authStore);
 </script>
 
 <template>
   <div v-if="user" class="user-banner">
     <span class="user-banner__icon">👤</span>
     <span class="user-banner__name">
-      {{ user.first_name }} {{ user.last_name || '' }}
+      {{ user.first_name }} {{ user.last_name || "" }}
     </span>
     <span v-if="user.username" class="user-banner__username">
       (@{{ user.username }})
@@ -18,7 +18,7 @@ const { user, userId } = storeToRefs(authStore)
 
 <style lang="scss" scoped>
 @use "sass:color";
-@use '~/assets/styles/variables' as *;
+@use "~/assets/styles/variables" as *;
 
 .user-banner {
   background-color: $color-bg-user;
@@ -54,4 +54,3 @@ const { user, userId } = storeToRefs(authStore)
   }
 }
 </style>
-
