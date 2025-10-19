@@ -89,7 +89,9 @@ const handleBack = () => emit("back");
 <template>
   <div class="form-detail">
     <button @click="handleBack" class="form-detail__back-btn">← Назад</button>
-    <h1 class="form-detail__title">{{ formTitle }}</h1>
+    <div class="form-detail__header">
+      <h1 class="form-detail__title">{{ formTitle }}</h1>
+    </div>
 
     <form @submit.prevent="handleSubmit" class="form-detail__form">
       <div v-if="isLoading" class="form-detail__loading">Загрузка...</div>
@@ -155,21 +157,42 @@ const handleBack = () => emit("back");
 
 .form-detail {
   @include content-container($max-width-content);
-
+  font-family: "Montserrat", sans-serif;
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background-color: white;
   &__back-btn {
     @include button-transparent;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: $color-text-primary;
     padding: $spacing-sm 0;
   }
-
+  &__header {
+    text-align: center;
+    margin-bottom: 120px;
+    background-image: url("/Top.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    position: absolute;
+  }
   &__title {
-    margin: $spacing-base 0 $spacing-xl;
     color: $color-text-primary;
+    font-weight: 300;
+    text-align: center;
+    font-family: "MyFont", sans-serif;
+    color: white;
   }
 
   &__form {
     width: 100%;
+    position: absolute;
+    margin-top: $header-height;
   }
 
   &__loading {
@@ -181,19 +204,25 @@ const handleBack = () => emit("back");
     display: flex;
     flex-direction: column;
     gap: $spacing-base;
+    margin-right: 10px;
   }
 
   &__actions {
     margin-top: $spacing-sm;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   &__submit-btn {
     @include button-base;
-    background-color: $color-primary;
+    background-color: #881014;
     color: white;
-
+    border-radius: 5px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
     &:hover:not(&--disabled) {
-      background-color: color.scale($color-primary, $lightness: -10%);
+      background-color: color.scale(#881014, $lightness: -30%);
     }
   }
 
@@ -221,7 +250,8 @@ const handleBack = () => emit("back");
   &__label {
     display: block;
     margin-bottom: $spacing-sm - 2px;
-    font-weight: 600;
+    font-weight: 500;
+    font-family: "Montserrat", sans-serif;
     color: $color-text-primary;
   }
 
@@ -233,15 +263,15 @@ const handleBack = () => emit("back");
   &__input {
     width: 100%;
     padding: $spacing-md - 2px $spacing-md;
-    border: 2px solid $color-border;
-    border-radius: $border-radius-sm;
+    border: 2px solid gray;
+    border-radius: $border-radius-xl;
     font-size: 1rem;
     transition: border-color $transition-base;
     box-sizing: border-box;
 
     &:focus {
       outline: none;
-      border-color: $color-border-focus;
+      border-color: #cc1d23;
     }
   }
 

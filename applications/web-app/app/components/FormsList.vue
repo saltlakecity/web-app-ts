@@ -11,7 +11,8 @@ const handleFormClick = (formId: number) => emit("form-selected", formId);
 <template>
   <div class="forms-page">
     <div class="forms-page__header">
-      <h1 class="forms-page__header_text">Студформы</h1>
+      <h1 class="forms-page__header_text">студформы</h1>
+      <img src="/Top_title.svg" class="forms-page__header_title"></img>
     </div>
 
     <div class="forms-page__container">
@@ -51,23 +52,29 @@ const handleFormClick = (formId: number) => emit("form-selected", formId);
   margin: 0;
   padding: 0;
   width: 100%;
+  background-color: white;
   &__header {
     position: absolute;
     top: 0;
     width: 100%;
     height: $header-height;
-    background-color: #cc1d23;
-    // background-image: url("/Top.png");
+    background-image: url("/Top.svg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+  }
+  &__header_title {
+    margin-left:-18px;
   }
   &__header_text {
     color: white;
     align-self: center;
     font-family: "MyFont", sans-serif;
+    font-weight: 300;
   }
   &__container {
     display: flex;
@@ -100,6 +107,7 @@ const handleFormClick = (formId: number) => emit("form-selected", formId);
   &__list {
     display: flex;
     flex-direction: column;
+    margin-right:12px;
   }
 }
 </style>
