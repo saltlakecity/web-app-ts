@@ -192,7 +192,10 @@ const handleBack = () => emit("back");
   &__form {
     width: 100%;
     position: absolute;
-    margin-top: $header-height;
+    margin-top: 180px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
   }
 
   &__loading {
@@ -205,6 +208,7 @@ const handleBack = () => emit("back");
     flex-direction: column;
     gap: $spacing-base;
     margin-right: 10px;
+    width: 80%;
   }
 
   &__actions {
