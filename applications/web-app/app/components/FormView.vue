@@ -88,8 +88,8 @@ const handleBack = () => emit("back");
 
 <template>
   <div class="form-detail">
-    <button @click="handleBack" class="form-detail__back-btn">← Назад</button>
     <div class="form-detail__header">
+      <button @click="handleBack" class="form-detail__back-btn">←</button>
       <h1 class="form-detail__title">{{ formTitle }}</h1>
     </div>
 
@@ -160,7 +160,6 @@ const handleBack = () => emit("back");
   font-family: "Montserrat", sans-serif;
   position: relative;
   min-height: 100vh;
-  width: 100vw;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -170,6 +169,10 @@ const handleBack = () => emit("back");
     font-size: 1rem;
     color: $color-text-primary;
     padding: $spacing-sm 0;
+    top: 80px;
+    left: 10px;
+    font-size: 32px;
+    z-index: 9999;
   }
   &__header {
     text-align: center;
@@ -180,6 +183,10 @@ const handleBack = () => emit("back");
     background-size: cover;
     width: 100%;
     position: absolute;
+    font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
   &__title {
     color: $color-text-primary;
@@ -187,12 +194,13 @@ const handleBack = () => emit("back");
     text-align: center;
     font-family: "MyFont", sans-serif;
     color: white;
+  
   }
 
   &__form {
     width: 100%;
     position: absolute;
-    margin-top: 180px;
+    margin-top: 120px;
     align-items: center;
     justify-content: center;
     display: flex;
