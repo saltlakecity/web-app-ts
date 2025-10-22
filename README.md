@@ -1,93 +1,260 @@
-# studform-trpc-vue
+# Студсовет Web App
 
+Monorepo проект для студформ, включающий Telegram Mini App, API сервер и Telegram бота.
 
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## 📦 Структура проекта
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.kosygin-rsu.ru/studsovet/studform-trpc-vue.git
-git branch -M master
-git push -uf origin master
+studsovet-web-app/
+├── applications/
+│   ├── server/              # API сервер (Express + tRPC)
+│   ├── web-app/             # Telegram Mini App (Nuxt 3)
+│   └── telegram-bot/        # Telegram бот (Grammy)
+├── package.json             # Root package.json для workspace
+├── pnpm-workspace.yaml      # Конфигурация pnpm workspace
+└── docker-compose.yml       # Docker конфигурация
 ```
 
-## Integrate with your tools
+## 🚀 Быстрый старт
 
-- [ ] [Set up project integrations](https://gitlab.kosygin-rsu.ru/studsovet/studform-trpc-vue/-/settings/integrations)
+### Требования
 
-## Collaborate with your team
+- Node.js >= 18
+- pnpm >= 9
+- PostgreSQL >= 14
+- Docker и Docker Compose (опционально)
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Установка
 
-## Test and Deploy
+```bash
+# Клонирование репозитория
+git clone <repository-url>
+cd studsovet-web-app
 
-Use the built-in continuous integration in GitLab.
+# Установка всех зависимостей
+pnpm install
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+# Настройка переменных окружения
+cp env.example .env
+cp applications/server/.env.example applications/server/.env
+cp applications/telegram-bot/.env.example applications/telegram-bot/.env
+```
 
-***
+### Настройка базы данных
 
-# Editing this README
+```bash
+# Запуск PostgreSQL через Docker
+docker-compose up -d postgres
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+# Или используйте свой экземпляр PostgreSQL
+# и настройте подключение в applications/server/.env
+```
 
-## Suggestions for a good README
+### Запуск в режиме разработки
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+# Запуск API сервера
+cd applications/server
+pnpm dev
 
-## Name
-Choose a self-explaining name for your project.
+# В другом терминале - запуск веб-приложения
+cd applications/web-app
+pnpm dev
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+# В третьем терминале - запуск Telegram бота
+cd applications/telegram-bot
+pnpm dev
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## 🏗️ Приложения
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### API Сервер (`applications/server`)
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Express сервер с tRPC API для работы с формами и авторизацией через Telegram.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+**Технологии:**
+- Express 5
+- tRPC 11
+- PostgreSQL (pg)
+- JWT авторизация
+- TypeScript
+- Zod для валидации
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+**Основные возможности:**
+- ✅ JWT авторизация через Telegram WebApp
+- ✅ CRUD операции с формами
+- ✅ Валидация данных через Telegram InitData
+- ✅ Type-safe API через tRPC
+- ✅ Shared типы между фронтендом и бэкендом
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+[Подробнее →](applications/server/README.md)
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+### Web App (`applications/web-app`)
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Telegram Mini App на Nuxt 3 для заполнения форм.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+**Технологии:**
+- Nuxt 3
+- Vue 3 Composition API
+- TypeScript
+- Pinia для state management
+- tRPC клиент
+- SCSS
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+**Основные возможности:**
+- ✅ Авторизация через Telegram WebApp
+- ✅ Список и заполнение форм
+- ✅ Адаптивный дизайн
+- ✅ SSR отключен (SPA режим)
+- ✅ Интеграция с Telegram UI
 
-## License
-For open source projects, say how it is licensed.
+[Подробнее →](applications/web-app/README.md)
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+### Telegram Bot (`applications/telegram-bot`)
+
+Telegram бот для взаимодействия с пользователями и запуска Mini App.
+
+**Технологии:**
+- Grammy (Telegram Bot Framework)
+- TypeScript
+- Polling режим
+
+**Основные возможности:**
+- ✅ Команды `/start` и `/help`
+- ✅ Кнопка для запуска Mini App
+- ✅ Graceful shutdown
+- ✅ Обработка ошибок
+
+[Подробнее →](applications/telegram-bot/README.md)
+
+## 🔧 Конфигурация
+
+### Переменные окружения
+
+#### Корневой `.env`
+```env
+# Общие настройки
+NODE_ENV=development
+```
+
+#### `applications/server/.env`
+```env
+# База данных
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=studsovet
+
+# API
+PORT=3100
+
+# JWT
+JWT_SECRET=your-secret-key-here
+
+# Telegram
+BOT_TOKEN=your-telegram-bot-token
+```
+
+#### `applications/telegram-bot/.env`
+```env
+BOT_TOKEN=your-telegram-bot-token
+MINI_APP_URL=https://your-app-url.com
+```
+
+## 🐳 Docker
+
+```bash
+# Запуск всех сервисов
+docker-compose up -d
+
+# Просмотр логов
+docker-compose logs -f
+
+# Остановка
+docker-compose down
+```
+
+## 📝 Скрипты
+
+```bash
+# Установка всех зависимостей
+pnpm install
+
+# Сборка всех приложений
+pnpm build
+
+# Линтинг (если настроен)
+pnpm lint
+
+# Форматирование (если настроено)
+pnpm format
+```
+
+## 🗄️ База данных
+
+### Схема
+
+- `forms` - формы для заполнения
+- `form_fields` - поля форм
+- `responses` - ответы пользователей
+- `response_fields` - значения полей в ответах
+
+### Миграции
+
+Миграции находятся в `applications/server/migrations/`:
+- `0_initial_schema.sql` - начальная схема БД
+- `1_form_fields.sql` - добавление позиций для полей
+- `2_responses.sql` - добавление responder_id
+
+## 🔐 Безопасность
+
+- ✅ JWT токены с коротким сроком жизни (10 минут)
+- ✅ Валидация Telegram InitData через HMAC
+- ✅ Переменные окружения для секретов
+- ✅ SQL параметризованные запросы (защита от SQL injection)
+- ✅ CORS настроен
+- ✅ Проверка обязательных env переменных
+
+## 📚 Архитектурные решения
+
+### Monorepo
+
+Используется pnpm workspaces для управления монорепозиторием. Это позволяет:
+- Переиспользовать код между приложениями
+- Управлять зависимостями централизованно
+- Иметь единую конфигурацию TypeScript
+
+### Shared типы
+
+Типы и схемы Zod вынесены в `applications/server/shared/` и используются:
+- В API сервере для валидации
+- В веб-приложении для type-safety
+- В tRPC для автоматической типизации
+
+### tRPC
+
+Используется tRPC для type-safe API без кодогенерации:
+- Автоматическая типизация на клиенте
+- Валидация через Zod
+- Удобная работа с ошибками
+
+## 🧪 Тестирование
+
+```bash
+# TODO: Добавить тесты
+pnpm test
+```
+
+## 📦 Сборка для production
+
+```bash
+# Сборка всех приложений
+pnpm build
+
+# Запуск в production режиме
+cd applications/server && pnpm start
+cd applications/web-app && pnpm start
+cd applications/telegram-bot && pnpm start
+```
+

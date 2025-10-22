@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./applications/server/migrations:/docker-entrypoint-initdb.d
+  backend:
+    build:
+      context: ./applications/server
+      dockerfile: Dockerfile
+    environment:
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: mydb
+      PORT: 3000
+      BOT_TOKEN: ${BOT_TOKEN}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  # telegram-bot:
+  #   build:
+  #     context: ./applications/telegram-bot
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     BOT_TOKEN: ${BOT_TOKEN}
+  #     MINI_APP_URL: ${MINI_APP_URL}
+  #     NODE_ENV: production
+  #   depends_on:
+  #     - backend
+  frontend:
+    build:
+      context: ./applications/web-app-vue-ts
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: "/api"
+    environment:
+      VITE_API_URL: /api
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./applications/web-app-vue-ts/src:/app/src
+
+volumes:
+  postgres_data:

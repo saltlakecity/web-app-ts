@@ -1,0 +1,193 @@
+
+@font-face {
+  font-family: 'MyFont';
+  src: url('/fonts/Gothic60-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Основные стили для приложения */
+
+
+.loading, .error {
+  padding: 1rem;
+  text-align: center;
+  margin: 1rem;
+  border-radius: 8px;
+}
+
+.loading {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.error {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.user-info {
+  background-color: #f3e5f5;
+  padding: 0.5rem 1rem;
+  margin: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  border-left: 4px solid #9c27b0;
+}
+
+.user-info small {
+  display: block;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+/* Стили для форм */
+.forms_container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 23vh;
+  width: 100%;
+  padding: 16px;
+}
+
+.header-logo {
+  display: flex;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 23vh;
+  background-image: url("/Top.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.form-card-statustext {
+  margin-right: 30px;
+  font-weight: 800;
+}
+
+.form-card {
+  font-family: Montserrat, sans-serif;
+  border-radius: 30px;
+  padding: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-card--active .form-card-statustext {
+  color: red;
+}
+
+.form-card--active {
+  background-color: rgba(255, 0, 0, 0.275);
+  color: red;
+  box-shadow: 0 0 8px red;
+}
+
+.form-card--inprocess .form-card-statustext {
+  color: orange;
+}
+
+.form-card--inprocess {
+  color: red;
+  border: 1px solid red;
+}
+
+.form-card--completed .form-card-statustext {
+  color: green;
+}
+
+.form-card--completed {
+  color: gray;
+  border: 1px solid gray;
+}
+
+.form-card:hover {
+  cursor: pointer;
+  transform: translateY(-2px);
+  transition: transform 120ms ease;
+}
+
+/* Стили для просмотра формы */
+.form-view {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #2c3e50;
+}
+
+.form-field {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.required {
+  color: red;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.field-error {
+  color: red;
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+.actions {
+  margin-top: 18px;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+
+.success {
+  color: green;
+  margin-top: 10px;
+}
+
+.empty {
+  color: #666;
+  margin-top: 12px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}

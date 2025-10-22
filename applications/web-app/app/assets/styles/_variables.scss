@@ -1,0 +1,59 @@
+// Colors
+$color-primary: #42b983;
+$color-error: #f44336;
+$color-success: #4caf50;
+$color-warning: #ff8c00;
+$color-info: #1976d2;
+
+$color-text-primary: #2c3e50;
+$color-text-secondary: #666666;
+$color-text-light: #999999;
+
+$color-border: #dddddd;
+$color-border-focus: $color-primary;
+$color-border-error: $color-error;
+
+$color-bg-light: #f5f5f5;
+$color-bg-error: #ffebee;
+$color-bg-success: #e8f5e9;
+$color-bg-info: #e3f2fd;
+$color-bg-user: #f3e5f5;
+
+$color-disabled: #cccccc;
+$color-gray: #808080;
+
+// Form statuses
+$color-form-active: #ff0000;
+$color-form-inprocess: #ff8c00;
+$color-form-completed: #4caf50;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-base: 16px;
+$spacing-lg: 20px;
+$spacing-xl: 24px;
+$spacing-xxl: 32px;
+
+// Border radius
+$border-radius-sm: 2px;
+$border-radius-md: 4px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+
+// Transitions
+$transition-fast: 120ms;
+$transition-base: 200ms;
+$transition-slow: 300ms;
+
+// Breakpoints
+$breakpoint-mobile: 576px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 992px;
+$breakpoint-wide: 1200px;
+
+// Layout
+$max-width-content: 600px;
+$header-height: 23vh;
+
