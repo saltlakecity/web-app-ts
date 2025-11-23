@@ -9,4 +9,6 @@ export interface FormField {
   type: string;
   label: string;
   required?: boolean;
+  options?: string[];
+  description?: string;
 }

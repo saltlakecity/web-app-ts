@@ -40,3 +40,5 @@ CREATE INDEX IF NOT EXISTS idx_responses_form_id ON responses(form_id);
 
 -- индекс на form_id (form_fields)
 CREATE INDEX IF NOT EXISTS idx_form_fields_form_id ON form_fields(form_id);
+
+ALTER TABLE forms ADD COLUMN description TEXT;
