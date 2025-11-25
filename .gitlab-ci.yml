@@ -29,7 +29,7 @@ build_backend:
 build_frontend:
   stage: build
   script:
-    - docker build -t $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME -f applications/web-app/Dockerfile .
+    - docker build -t $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME -f applications/web-app/Dockerfile ./applications/web-app
     - docker push $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME
     - docker tag $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME $IMAGE_REGISTRY/frontend:latest
     - docker push $IMAGE_REGISTRY/frontend:latest
