@@ -89,7 +89,6 @@ const handleBack = () => emit("back");
 <template>
   <div class="form-detail">
     <div class="form-detail__header">
-      <button @click="handleBack" class="form-detail__back-btn">←</button>
       <h1 class="form-detail__title">{{ formTitle }}</h1>
     </div>
 
@@ -97,6 +96,7 @@ const handleBack = () => emit("back");
       <div v-if="isLoading" class="form-detail__loading">Загрузка...</div>
 
       <div v-else class="form-detail__content">
+         <button @click="handleBack" class="form-detail__back-btn">←</button>
         <div
           v-for="field in formFields"
           :key="field.id"
@@ -108,6 +108,10 @@ const handleBack = () => emit("back");
             <span v-if="field.required" class="form-field__required">*</span>
           </label>
 
+          <div v-if="field.description" class="form-field__description">
+            {{ field.description }}
+          </div>
+
           <input
             v-if="field.type === 'text'"
             :id="field.id.toString()"
@@ -116,6 +120,23 @@ const handleBack = () => emit("back");
             type="text"
             class="form-field__input"
           />
+
+          <select
+            v-else-if="field.type === 'choice'"
+            :id="field.id.toString()"
+            v-model="values[String(field.id)]"
+            :required="field.required"
+            class="form-field__select"
+          >
+            <option value="">Выберите вариант</option>
+            <option
+              v-for="option in field.options"
+              :key="option"
+              :value="option"
+            >
+              {{ option }}
+            </option>
+          </select>
 
           <div v-if="fieldErrors[String(field.id)]" class="form-field__error">
             {{ fieldErrors[String(field.id)] }}
@@ -169,10 +190,12 @@ const handleBack = () => emit("back");
     font-size: 1rem;
     color: $color-text-primary;
     padding: $spacing-sm 0;
-    top: 80px;
+    top: 5px;
     left: 10px;
     font-size: 32px;
     z-index: 9999;
+    position: fixed;
+
   }
   &__header {
     text-align: center;
@@ -183,10 +206,11 @@ const handleBack = () => emit("back");
     background-size: cover;
     width: 100%;
     position: absolute;
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    // flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
   &__title {
     color: $color-text-primary;
@@ -194,7 +218,6 @@ const handleBack = () => emit("back");
     text-align: center;
     font-family: "MyFont", sans-serif;
     color: white;
-  
   }
 
   &__form {
@@ -267,6 +290,14 @@ const handleBack = () => emit("back");
     color: $color-text-primary;
   }
 
+  &__description {
+    margin-bottom: $spacing-sm;
+    font-size: 0.875rem;
+    color: #666;
+    font-family: "Montserrat", sans-serif;
+    line-height: 1.4;
+  }
+
   &__required {
     color: $color-error;
     margin-left: 2px;
@@ -280,6 +311,22 @@ const handleBack = () => emit("back");
     font-size: 1rem;
     transition: border-color $transition-base;
     box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: #cc1d23;
+    }
+  }
+
+  &__select {
+    width: 100%;
+    padding: $spacing-md - 2px $spacing-md;
+    border: 2px solid gray;
+    border-radius: $border-radius-xl;
+    font-size: 1rem;
+    transition: border-color $transition-base;
+    box-sizing: border-box;
+    background-color: white;
 
     &:focus {
       outline: none;

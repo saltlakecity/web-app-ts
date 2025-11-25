@@ -1,13 +1,19 @@
 FROM node:18-alpine
 
+RUN npm install -g pnpm
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm i
 
-COPY src ./src
-COPY tsconfig.json ./
+COPY pnpm-lock.yaml ./applications/server/
+COPY applications/server/package*.json ./applications/server/
 
-RUN npm run build
+WORKDIR /app/applications/server
+
+RUN pnpm install
+
+COPY applications/server/src ./src
+COPY applications/server/tsconfig.json ./
+COPY applications/server/shared ./shared
 
 EXPOSE 3000
-CMD ["node", "dist/server.js"]
+CMD ["npx", "tsx", "src/index.ts"]

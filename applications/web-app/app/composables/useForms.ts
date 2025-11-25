@@ -1,4 +1,4 @@
-import type { FormMeta, FormField } from "@studsovet/server/shared";
+import type { FormMeta, FormField } from "~/types/types";
 
 export function useForms() {
   const api = useApi();

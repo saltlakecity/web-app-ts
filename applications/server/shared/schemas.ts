@@ -17,6 +17,8 @@ export const FormFieldSchema = z.object({
   type: z.string(),
   label: z.string(),
   required: z.boolean().optional(),
+  options: z.array(z.string()).optional(),
+  description: z.string().optional(),
 });
 export type FormField = z.infer<typeof FormFieldSchema>;
 

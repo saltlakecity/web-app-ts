@@ -32,10 +32,13 @@ async function fetchForms(userId: number) {
 
 async function fetchFormFields(formId: number) {
   const res = await pool.query(
-    "SELECT id, form_id, field_type as type, field_label as label, is_required as required FROM form_fields WHERE form_id = $1 ORDER BY position, id",
+    "SELECT id, form_id, field_type as type, field_label as label, is_required as required, field_options as options, description FROM form_fields WHERE form_id = $1 ORDER BY position, id",
     [formId]
   );
-  return res.rows;
+  return res.rows.map(row => ({
+    ...row,
+    options: row.options ? JSON.parse(JSON.stringify(row.options)) : undefined
+  }));
 }
 
 async function fetchFormMeta(formId: number, userId: number) {
@@ -100,6 +103,25 @@ export async function saveResponse(
           String(found.value).trim() === ""
         ) {
           throw new Error(`Required field ${fieldId} is missing or empty`);
+        }
+      }
+    }
+
+    // Валидация choice полей: выбранное значение должно быть в списке вариантов
+    for (const a of answers) {
+      if (a.value) {
+        const fieldMeta = await client.query(
+          "SELECT field_type, field_options FROM form_fields WHERE id = $1",
+          [a.fieldId]
+        );
+        if (fieldMeta.rows.length > 0) {
+          const { field_type, field_options } = fieldMeta.rows[0];
+          if (field_type === 'choice' && field_options) {
+            const options = JSON.parse(JSON.stringify(field_options));
+            if (!options.includes(a.value)) {
+              throw new Error(`Invalid choice for field ${a.fieldId}: ${a.value}`);
+            }
+          }
         }
       }
     }
