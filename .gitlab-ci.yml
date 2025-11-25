@@ -22,11 +22,10 @@ build-and-run:
     - docker push $IMAGE_REGISTRY/backend:$CI_COMMIT_REF_NAME
   only:
     - master
-
-build_frontend:
-  stage: build
-  script:
-    - docker build -t $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME -f applications/web-app/Dockerfile .
-    - docker push $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME
-  only:
-    - master
+  build_frontend:
+    stage: build
+    script:
+      - docker build -t $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME -f applications/web-app/Dockerfile .
+      - docker push $IMAGE_REGISTRY/frontend:$CI_COMMIT_REF_NAME
+    only:
+      - master
