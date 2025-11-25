@@ -1,22 +1,22 @@
 services:
-  postgres:
-    image: postgres:15
-    container_name: postgres_web_app_ts
-    environment:
-      POSTGRES_USER: studform_db_user
-      POSTGRES_PASSWORD: studform_db_1488
-      POSTGRES_DB: studform_db
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U studform_db_user -d studform_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - shared
+  # postgres:
+  #   image: postgres:15
+  #   container_name: postgres_web_app_ts
+  #   environment:
+  #     POSTGRES_USER: studform_db_user
+  #     POSTGRES_PASSWORD: studform_db_1488
+  #     POSTGRES_DB: studform_db
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U studform_db_user -d studform_db"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - shared
   backend:
     build:
       context: .
@@ -50,24 +50,6 @@ services:
       - backend
     networks:
       - shared
-  directus:
-    image: directus/directus:latest
-    ports:
-      - "8055:8055"
-    environment:
-      DIRECTUS_DB_HOST: postgres
-      DIRECTUS_DB_PORT: 5432
-      DIRECTUS_DB_DATABASE: studform_db
-      DIRECTUS_DB_USER: studform_db_user
-      DIRECTUS_DB_PASSWORD: studform_db_1488
-      DIRECTUS_ADMIN_EMAIL: admin@example.com
-      DIRECTUS_ADMIN_PASSWORD: admin123
-      DIRECTUS_PUBLIC_URL: http://localhost:8055
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - shared
   nginx:
     image: nginx:alpine
     ports:
@@ -77,7 +59,6 @@ services:
     depends_on:
       - frontend
       - backend
-      - directus
     networks:
       - shared
 
