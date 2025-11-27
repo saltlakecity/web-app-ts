@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import { useFormMeta } from "~/composables/useForms";
+import {
+  validateFieldValue,
+  sanitizeString,
+  MAX_TEXT_FIELD_LENGTH,
+} from "~/utils/validation";
+
+// Экспортируем для использования в шаблоне
+const MAX_LENGTH = MAX_TEXT_FIELD_LENGTH;
 
 const props = defineProps<{
   formId: number;
@@ -39,18 +47,46 @@ watch(
   { immediate: true }
 );
 
+// Валидация при изменении значения поля
+function validateField(fieldId: string) {
+  const field = formFields.value.find((f) => String(f.id) === fieldId);
+  if (!field) return;
+
+  const value = values[fieldId] ?? "";
+  const validation = validateFieldValue(value, {
+    required: field.required,
+    maxLength: MAX_TEXT_FIELD_LENGTH,
+    allowedChoices: field.options,
+    fieldType: field.type,
+  });
+
+  if (!validation.valid) {
+    fieldErrors[fieldId] = validation.error || "Ошибка валидации";
+  } else {
+    fieldErrors[fieldId] = null;
+    // Применяем санитизацию
+    if (validation.sanitized !== undefined) {
+      values[fieldId] = validation.sanitized;
+    }
+  }
+}
+
 function validate(): boolean {
   let ok = true;
   for (const k of Object.keys(fieldErrors)) fieldErrors[k] = null;
 
   for (const f of formFields.value) {
-    if (f.required) {
-      const id = String(f.id);
-      const val = (values[id] ?? "").trim();
-      if (val === "") {
-        fieldErrors[id] = "Обязательное поле";
-        ok = false;
-      }
+    const id = String(f.id);
+    const validation = validateFieldValue(values[id] ?? "", {
+      required: f.required,
+      maxLength: MAX_TEXT_FIELD_LENGTH,
+      allowedChoices: f.options,
+      fieldType: f.type,
+    });
+
+    if (!validation.valid) {
+      fieldErrors[id] = validation.error || "Ошибка валидации";
+      ok = false;
     }
   }
   return ok;
@@ -64,10 +100,12 @@ async function handleSubmit() {
 
   const answers = formFields.value.map((f) => {
     const id = String(f.id);
-    const trimmed = (values[id] ?? "").trim();
+    const value = values[id] ?? "";
+    // Санитизация перед отправкой
+    const sanitized = sanitizeString(value, MAX_TEXT_FIELD_LENGTH);
     return {
       fieldId: id,
-      value: trimmed === "" ? null : trimmed,
+      value: sanitized === "" ? null : sanitized,
     };
   });
 
@@ -116,8 +154,11 @@ const handleBack = () => emit("back");
             v-if="field.type === 'text'"
             :id="field.id.toString()"
             v-model="values[String(field.id)]"
+            @blur="validateField(String(field.id))"
+            @input="validateField(String(field.id))"
             :required="field.required"
             type="text"
+            :maxlength="MAX_LENGTH"
             class="form-field__input"
           />
 
@@ -125,6 +166,7 @@ const handleBack = () => emit("back");
             v-else-if="field.type === 'choice'"
             :id="field.id.toString()"
             v-model="values[String(field.id)]"
+            @change="validateField(String(field.id))"
             :required="field.required"
             class="form-field__select"
           >

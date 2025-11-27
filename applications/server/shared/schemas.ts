@@ -4,30 +4,33 @@ import { z } from 'zod';
 
 // Схемы для форм
 export const FormMetaSchema = z.object({
-  id: z.number(),
-  title: z.string(),
-  status: z.string().optional(),
-  user_status: z.string().optional(), // completed, not_completed
+  id: z.number().int().positive(),
+  title: z.string().min(1).max(255),
+  status: z.string().max(50).optional(),
+  user_status: z.enum(["completed", "not_completed"]).optional(),
 });
 export type FormMeta = z.infer<typeof FormMetaSchema>;
 
 export const FormFieldSchema = z.object({
-  id: z.number(),
-  form_id: z.number(),
-  type: z.string(),
-  label: z.string(),
+  id: z.number().int().positive(),
+  form_id: z.number().int().positive(),
+  type: z.string().min(1).max(50),
+  label: z.string().min(1).max(255),
   required: z.boolean().optional(),
-  options: z.array(z.string()).optional(),
-  description: z.string().optional(),
+  options: z.array(z.string().min(1).max(500)).optional(),
+  description: z.string().max(1000).optional(),
 });
 export type FormField = z.infer<typeof FormFieldSchema>;
 
+// Схема для ответа на поле формы
+const FormAnswerSchema = z.object({
+  fieldId: z.string().min(1).max(50),
+  value: z.string().max(10000).nullable(),
+});
+
 export const FormResponseSchema = z.object({
-  formId: z.number(),
-  answers: z.array(z.object({
-    fieldId: z.string(),
-    value: z.string().nullable(),
-  })),
+  formId: z.number().int().positive(),
+  answers: z.array(FormAnswerSchema).min(1).max(100), // Ограничиваем количество полей
   responderId: z.string().optional(),
 });
 export type FormResponse = z.infer<typeof FormResponseSchema>;

@@ -6,6 +6,12 @@ import {
   FormResponseSchema,
 } from "../../shared/schemas";
 import { router, protectedProcedure } from "../middleware/auth";
+import {
+  sanitizeString,
+  validateLength,
+  containsDangerousPatterns,
+  MAX_TEXT_FIELD_LENGTH,
+} from "../utils/validation";
 
 async function fetchForms(userId: number) {
   // Получаем все формы
@@ -107,9 +113,27 @@ export async function saveResponse(
       }
     }
 
-    // Валидация choice полей: выбранное значение должно быть в списке вариантов
+    // Валидация и санитизация значений полей
     for (const a of answers) {
       if (a.value) {
+        // Санитизация значения
+        const sanitized = sanitizeString(a.value, MAX_TEXT_FIELD_LENGTH);
+        
+        // Проверка на опасные паттерны
+        if (containsDangerousPatterns(sanitized)) {
+          throw new Error(`Поле ${a.fieldId} содержит недопустимые символы`);
+        }
+        
+        // Валидация длины
+        const lengthCheck = validateLength(sanitized, 0, MAX_TEXT_FIELD_LENGTH);
+        if (!lengthCheck.valid) {
+          throw new Error(`Поле ${a.fieldId}: ${lengthCheck.error}`);
+        }
+        
+        // Обновляем значение на санитизированное
+        a.value = sanitized;
+        
+        // Валидация choice полей: выбранное значение должно быть в списке вариантов
         const fieldMeta = await client.query(
           "SELECT field_type, field_options FROM form_fields WHERE id = $1",
           [a.fieldId]
@@ -153,10 +177,11 @@ export async function saveResponse(
     const insertText =
       "INSERT INTO response_fields (response_id, field_id, value, responder_id) VALUES ($1, $2, $3, $4)";
     for (const a of answers) {
+      // Значение уже санитизировано выше, просто проверяем на null
       const value =
         a.value === null || a.value === undefined
           ? null
-          : String(a.value).slice(0, 10000);
+          : String(a.value);
       await client.query(insertText, [
         responseId,
         a.fieldId,

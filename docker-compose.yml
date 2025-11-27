@@ -32,11 +32,6 @@ services:
       DIRECTUS_URL: http://directus:8055
     ports:
       - "3000:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      directus:
-        condition: service_started
     networks:
       - shared
     restart: unless-stopped
