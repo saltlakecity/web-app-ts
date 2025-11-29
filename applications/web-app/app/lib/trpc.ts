@@ -3,10 +3,13 @@ import type { AppRouter } from '@studsovet/server/shared'
 import { useAuthStore } from '~/stores/auth'
 
 function createTRPCClientWithToken() {
+  const config = useRuntimeConfig()
+  const apiUrl = config.public.apiUrl || '/api'
+  
   return createTRPCClient<AppRouter>({
     links: [
       httpLink({
-        url: '/api/trpc',
+        url: `${apiUrl}/trpc`,
         headers() {
           const authStore = useAuthStore()
           const token = authStore.jwtToken

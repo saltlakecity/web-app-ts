@@ -31,7 +31,9 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       "/api": {
-        target: "http://localhost:3100/api",
+        target: process.env.BACKEND_APP_URL
+          ? `${process.env.BACKEND_APP_URL}/api`
+          : "http://localhost:3100/api",
         changeOrigin: true,
       },
     },
@@ -43,7 +45,8 @@ export default defineNuxtConfig({
   // Настройки для работы с внешними API
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || "/api",
+      apiUrl: process.env.API_URL || "/api",
+      frontendAppUrl: process.env.FRONTEND_APP_URL || "http://localhost:3000",
     },
   },
 

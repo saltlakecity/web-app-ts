@@ -6,7 +6,15 @@ import { appRouter } from "./router";
 import { pool } from "./db";
 
 const app = express();
-app.use(cors());
+
+// Настройка CORS с использованием FRONTEND_APP_URL
+const frontendUrl = process.env.FRONTEND_APP_URL;
+app.use(
+  cors({
+    origin: frontendUrl || true, // Если FRONTEND_APP_URL не установлен, разрешаем все (для разработки)
+    credentials: true,
+  })
+);
 
 // Создание контекста для tRPC с типизацией
 export function createContext({ req, res }: CreateExpressContextOptions) {
@@ -28,8 +36,8 @@ app.use(
     createContext,
     onError: ({ error, path, input }) => {
       console.error(`❌ tRPC Error on ${path}:`, error);
-      console.error('Input:', input);
-      console.error('Error cause:', error.cause);
+      console.error("Input:", input);
+      console.error("Error cause:", error.cause);
     },
   })
 );

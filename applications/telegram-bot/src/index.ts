@@ -7,8 +7,13 @@ const bot = new Bot(process.env.BOT_TOKEN!);
 
 // Команда /start
 bot.command('start', async (ctx) => {
+  const miniAppUrl = process.env.MINI_APP_URL || process.env.FRONTEND_APP_URL;
+  if (!miniAppUrl) {
+    throw new Error('MINI_APP_URL или FRONTEND_APP_URL должен быть установлен в переменных окружения');
+  }
+  
   const keyboard = new InlineKeyboard()
-    .webApp('Открыть Mini App', process.env.MINI_APP_URL!);
+    .webApp('Открыть Mini App', miniAppUrl);
   
   await ctx.reply(
     '👋 Добро пожаловать в Student Council Bot!\n\n' +
@@ -49,7 +54,8 @@ async function startBot() {
     // Запускаем polling
     await bot.start();
     console.log('🤖 Telegram Bot запущен в polling режиме');
-    console.log(`📱 Mini App URL: ${process.env.MINI_APP_URL}`);
+    const miniAppUrl = process.env.MINI_APP_URL || process.env.FRONTEND_APP_URL;
+    console.log(`📱 Mini App URL: ${miniAppUrl}`);
     
     // Обработка graceful shutdown
     process.once('SIGINT', () => bot.stop());
