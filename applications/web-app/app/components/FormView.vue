@@ -98,11 +98,6 @@ async function handleSubmit() {
 }
 
 const handleBack = () => emit("back");
-
-// Динамический отступ формы в зависимости от наличия description
-const formTopOffset = computed(() => 
-  formMeta.value?.description ? 'calc(23vh + 90px)' : 'calc(23vh + 50px)'
-);
 </script>
 
 <template>
@@ -111,15 +106,16 @@ const formTopOffset = computed(() =>
       <h1 class="form-detail__title">{{ formTitle }}</h1>
     </div>
 
-    <div class="form-detail__nav">
-      <button @click="handleBack" class="form-detail__back-btn">←</button>
-    </div>
+    <div class="form-detail__body">
+      <div class="form-detail__nav">
+        <button @click="handleBack" type="button" class="form-detail__back-btn">←</button>
+      </div>
 
-    <div v-if="formMeta?.description" class="form-detail__description">
-      {{ formMeta.description }}
-    </div>
+      <div v-if="formMeta?.description" class="form-detail__description">
+        {{ formMeta.description }}
+      </div>
 
-    <form @submit.prevent="handleSubmit" class="form-detail__form">
+      <form @submit.prevent="handleSubmit" class="form-detail__form">
       <div v-if="isLoading" class="form-detail__loading">Загрузка...</div>
 
       <div v-else class="form-detail__content">
@@ -127,9 +123,6 @@ const formTopOffset = computed(() =>
         <template v-for="field in formFields" :key="field.id">
           <div v-if="field.type === 'section_header'" class="form-section-header">
             <h2 class="form-section-header__title">{{ field.label }}</h2>
-            <p v-if="field.description" class="form-section-header__description">
-              {{ field.description }}
-            </p>
           </div>
           
           <!-- Обычное поле -->
@@ -204,6 +197,7 @@ const formTopOffset = computed(() =>
         </div>
       </div>
     </form>
+    </div>
   </div>
 </template>
 
@@ -213,14 +207,12 @@ const formTopOffset = computed(() =>
 @use "~/assets/styles/mixins" as *;
 
 .form-detail {
-  @include content-container($max-width-content);
   font-family: "Montserrat", sans-serif;
-  position: relative;
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
   width: 100%;
   background-color: white;
+  display: flex;
+  flex-direction: column;
 
   &__header {
     text-align: center;
@@ -230,10 +222,8 @@ const formTopOffset = computed(() =>
     background-size: cover;
     width: 100%;
     height: $header-height;
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-size: 14px;
+    min-height: $header-height;
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -246,14 +236,19 @@ const formTopOffset = computed(() =>
     color: white;
   }
 
-  &__nav {
-    position: absolute;
-    top: $header-height;
-    left: 0;
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    padding: $spacing-sm $spacing-base;
+    padding: 0 $spacing-base $spacing-xxl;
     box-sizing: border-box;
-    z-index: 100;
+  }
+
+  &__nav {
+    width: 100%;
+    padding: $spacing-sm 0;
+    box-sizing: border-box;
   }
 
   &__back-btn {
@@ -271,11 +266,8 @@ const formTopOffset = computed(() =>
   }
 
   &__description {
-    position: absolute;
-    top: calc(#{$header-height} + 48px);
-    left: 0;
     width: 100%;
-    padding: 0 $spacing-base;
+    padding: 0 $spacing-sm $spacing-base;
     box-sizing: border-box;
     font-size: 0.9rem;
     color: $color-text-secondary;
@@ -285,13 +277,10 @@ const formTopOffset = computed(() =>
 
   &__form {
     width: 100%;
-    position: absolute;
-    top: v-bind(formTopOffset);
-    left: 0;
+    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding-bottom: $spacing-xxl;
   }
 
   &__loading {
@@ -303,12 +292,12 @@ const formTopOffset = computed(() =>
     display: flex;
     flex-direction: column;
     gap: $spacing-base;
-    margin-right: 10px;
-    width: 80%;
+    width: 100%;
+    max-width: 500px;
   }
 
   &__actions {
-    margin-top: $spacing-sm;
+    margin-top: $spacing-lg;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -420,15 +409,7 @@ const formTopOffset = computed(() =>
     font-size: 1.1rem;
     font-weight: 600;
     color: $color-text-primary;
-    margin: 0 0 $spacing-xs;
-  }
-
-  &__description {
-    font-family: "Montserrat", sans-serif;
-    font-size: 0.85rem;
-    color: $color-text-secondary;
     margin: 0;
-    line-height: 1.4;
   }
 }
 </style>

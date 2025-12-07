@@ -666,7 +666,7 @@
             <input type="text" id="fieldLabel" placeholder="Отображаемое название">
           </div>
         </div>
-        <div class="input-group">
+        <div class="input-group" id="fieldDescriptionGroup">
           <label for="fieldDescription">Описание</label>
           <textarea id="fieldDescription" placeholder="Подсказка для пользователя"></textarea>
         </div>
@@ -904,8 +904,7 @@
             </div>
             ${isSectionHeader ? `
               <div class="section-header-preview">
-                <h4 style="margin: 0 0 4px; color: var(--text-primary);">${field.field_label || 'Без названия'}</h4>
-                ${field.description ? `<p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">${field.description}</p>` : ''}
+                <h4 style="margin: 0; color: var(--text-primary);">${field.field_label || 'Без названия'}</h4>
               </div>
             ` : `
               <div class="field-info">
@@ -1042,15 +1041,16 @@
       const type = document.getElementById('fieldType').value;
       const optionsGroup = document.getElementById('optionsGroup');
       const requiredGroup = document.getElementById('fieldRequired').parentElement.parentElement;
-      const fieldNameGroup = document.getElementById('fieldName').parentElement.parentElement;
+      const fieldDescriptionGroup = document.getElementById('fieldDescriptionGroup');
       
       // Показываем варианты только для типов с выбором
       const showOptions = ['choice', 'select', 'radio'].includes(type);
       optionsGroup.style.display = showOptions ? 'block' : 'none';
       
-      // Для заголовков секций скрываем "обязательное поле" и делаем имя опциональным
+      // Для заголовков секций скрываем "обязательное поле" и "описание"
       const isSectionHeader = type === 'section_header';
       requiredGroup.style.display = isSectionHeader ? 'none' : 'block';
+      fieldDescriptionGroup.style.display = isSectionHeader ? 'none' : 'block';
       
       // Автозаполняем имя для заголовка секции
       if (isSectionHeader) {
@@ -1058,6 +1058,8 @@
         if (!fieldName.value) {
           fieldName.value = 'section_' + Date.now();
         }
+        // Очищаем описание для заголовка
+        document.getElementById('fieldDescription').value = '';
       }
     }
 
