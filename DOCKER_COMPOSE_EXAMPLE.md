@@ -47,14 +47,15 @@ services:
     privileged: true
     environment:
       # URL бэкенда для проксирования API запросов (ДОБАВЛЕНО!)
-      # ВАЖНО: Используйте публичный URL, т.к. backend на отдельном поддомене
-      BACKEND_APP_URL: "https://api.webapp.studsovet.kosygin-rsu.ru"
+      # НЕ ИСПОЛЬЗУЕТСЯ в текущей конфигурации, т.к. запросы идут напрямую
+      # BACKEND_APP_URL: "https://api.webapp.studsovet.kosygin-rsu.ru"
 
       # Публичный URL фронтенда (ДОБАВЛЕНО!)
       FRONTEND_APP_URL: "https://webapp.studsovet.kosygin-rsu.ru"
 
-      # Путь к API (ДОБАВЛЕНО!)
-      API_URL: "/api"
+      # ВАЖНО! Полный URL к API (ДОБАВЛЕНО!)
+      # Для вашей конфигурации с отдельным поддоменом API
+      API_URL: "https://api.webapp.studsovet.kosygin-rsu.ru/api"
 
       # Настройки Nuxt сервера (ДОБАВЛЕНО!)
       HOST: "0.0.0.0"
@@ -77,12 +78,13 @@ services:
 
 ### Frontend (полностью новая секция environment):
 
-- ✅ `BACKEND_APP_URL` - URL backend API
 - ✅ `FRONTEND_APP_URL` - публичный URL фронтенда
-- ✅ `API_URL` - путь к API
+- ✅ `API_URL` - **ПОЛНЫЙ URL** к API (включая домен!)
 - ✅ `HOST` - слушать на всех интерфейсах (обязательно для Docker!)
 - ✅ `PORT` - порт внутри контейнера
 - ✅ `NODE_ENV` - режим production
+
+**Важно:** `API_URL` должен содержать полный URL с доменом, т.к. backend на отдельном поддомене!
 
 ## Команды для применения
 

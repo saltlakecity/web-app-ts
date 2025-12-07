@@ -29,9 +29,8 @@ backend:
 ```yaml
 frontend:
   environment:
-    BACKEND_APP_URL: "https://api.webapp.studsovet.kosygin-rsu.ru"
     FRONTEND_APP_URL: "https://webapp.studsovet.kosygin-rsu.ru"
-    API_URL: "/api"
+    API_URL: "https://api.webapp.studsovet.kosygin-rsu.ru/api" # ← ПОЛНЫЙ URL!
     HOST: "0.0.0.0"
     PORT: "3000"
     NODE_ENV: "production"

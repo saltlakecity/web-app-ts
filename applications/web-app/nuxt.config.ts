@@ -57,7 +57,12 @@ export default defineNuxtConfig({
   // Настройки для работы с внешними API
   runtimeConfig: {
     public: {
-      apiUrl: process.env.API_URL || "/api",
+      // В production используем полный URL API, в dev - относительный
+      apiUrl:
+        process.env.API_URL ||
+        (process.env.NODE_ENV === "production"
+          ? "https://api.webapp.studsovet.kosygin-rsu.ru/api"
+          : "/api"),
       frontendAppUrl: process.env.FRONTEND_APP_URL || "http://localhost:3000",
     },
   },
