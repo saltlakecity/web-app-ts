@@ -216,9 +216,15 @@ curl https://api.webapp.studsovet.kosygin-rsu.ru/api/health
    - Troubleshooting и частые проблемы
 
 5. **[ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)**
+
    - Настройка переменных окружения
    - Как работает проксирование
    - Настройка CORS
+
+6. **[FIX_INSTANCE_UNAVAILABLE.md](FIX_INSTANCE_UNAVAILABLE.md)**
+   - Исправление ошибки "[nuxt] instance unavailable"
+   - Как работает lazy initialization
+   - Как избежать подобных ошибок
 
 ### Дополнительные файлы:
 
@@ -275,6 +281,7 @@ curl https://api.webapp.studsovet.kosygin-rsu.ru/api/health
 
 - [x] Изменен `applications/web-app/Dockerfile` - убран nginx, добавлен Node.js
 - [x] Обновлен `applications/web-app/nuxt.config.ts` - добавлены routeRules
+- [x] Исправлен `applications/web-app/app/lib/trpc.ts` - lazy initialization
 - [x] Помечен `applications/web-app/nginx.conf` как deprecated
 - [x] CORS правильно настроен в `applications/server/src/index.ts`
 - [x] Создана документация

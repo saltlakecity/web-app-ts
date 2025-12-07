@@ -14,6 +14,7 @@ Gracefully stopping... (press Ctrl+C again to force)
 1. **Использовался nginx** вместо встроенного Nuxt.js сервера
 2. **Неправильная конфигурация портов** - nginx слушал на порту 80, а docker-compose ожидал порт 3000
 3. **Отсутствовали переменные окружения** для подключения к backend API
+4. **Ошибка в tRPC клиенте** - "[nuxt] instance unavailable" из-за вызова composables при импорте модуля
 
 ## ✅ Решение
 
@@ -36,6 +37,7 @@ Gracefully stopping... (press Ctrl+C again to force)
 
 - ✅ `applications/web-app/Dockerfile`
 - ✅ `applications/web-app/nuxt.config.ts`
+- ✅ `applications/web-app/app/lib/trpc.ts`
 
 ### На сервере (нужно изменить):
 
@@ -63,9 +65,14 @@ Gracefully stopping... (press Ctrl+C again to force)
    - Troubleshooting
 
 4. **ENVIRONMENT_SETUP.md**
+
    - Настройка переменных окружения
    - Как работает проксирование
    - Настройка CORS
+
+5. **FIX_INSTANCE_UNAVAILABLE.md**
+   - Исправление ошибки "[nuxt] instance unavailable"
+   - Как работает lazy initialization
 
 ## 🚀 Быстрый старт
 
