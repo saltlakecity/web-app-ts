@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Конструктор Форм</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-card: #1a1a24;
+      --bg-card-hover: #22222e;
+      --border-color: #2a2a3a;
+      --text-primary: #f0f0f5;
+      --text-secondary: #8888a0;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --danger: #ef4444;
+      --danger-hover: #f87171;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 2rem;
+    }
+
+    .sidebar {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      height: fit-content;
+      position: sticky;
+      top: 2rem;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .forms-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .form-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .form-item:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+
+    .form-item.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .form-item-title {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-item-status {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .status-active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .status-draft {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .form-item-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .editor-area {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      min-height: 600px;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .form-editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-editor-title-group {
+      flex: 1;
+    }
+
+    .form-editor-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .input-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .fields-section {
+      margin-top: 2rem;
+    }
+
+    .fields-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .fields-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .fields-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .field-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      transition: all 0.2s ease;
+    }
+
+    .field-card:hover {
+      border-color: var(--accent);
+    }
+
+    .field-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .field-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .field-card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .icon-btn.danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .field-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .field-info-item {
+      font-size: 0.85rem;
+    }
+
+    .field-info-item span:first-child {
+      color: var(--text-secondary);
+    }
+
+    .field-info-item span:last-child {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlideIn 0.2s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .options-editor {
+      margin-top: 0.5rem;
+    }
+
+    .option-item {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-item input {
+      flex: 1;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 1rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-weight: 500;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-color: var(--success);
+    }
+
+    .toast.error {
+      border-color: var(--danger);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">📝</div>
+        <h1>Конструктор Форм</h1>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Формы</h2>
+          <button class="btn btn-primary btn-sm" onclick="showCreateFormModal()">
+            + Новая
+          </button>
+        </div>
+        <div class="forms-list" id="formsList">
+          <!-- Forms will be loaded here -->
+        </div>
+      </aside>
+
+      <main class="editor-area" id="editorArea">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <h3>Выберите форму для редактирования</h3>
+          <p>Или создайте новую форму</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Create/Edit Form Modal -->
+  <div class="modal-overlay" id="formModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="formModalTitle">Создать форму</h3>
+        <button class="icon-btn" onclick="closeModal('formModal')">✕</button>
+      </div>
+      <form id="formForm">
+        <input type="hidden" id="formId">
+        <div class="input-group">
+          <label for="formTitle">Название формы *</label>
+          <input type="text" id="formTitle" required placeholder="Введите название">
+        </div>
+        <div class="input-group">
+          <label for="formDescription">Описание</label>
+          <textarea id="formDescription" placeholder="Описание формы (необязательно)"></textarea>
+        </div>
+        <div class="input-group">
+          <label for="formStatus">Статус</label>
+          <select id="formStatus">
+            <option value="draft">Черновик</option>
+            <option value="active">Активна</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('formModal')">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create/Edit Field Modal -->
+  <div class="modal-overlay" id="fieldModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="fieldModalTitle">Добавить поле</h3>
+        <button class="icon-btn" onclick="closeModal('fieldModal')">✕</button>
+      </div>
+      <form id="fieldForm">
+        <input type="hidden" id="fieldId">
+        <input type="hidden" id="fieldFormId">
+        <div class="input-group">
+          <label for="fieldType">Тип поля *</label>
+          <select id="fieldType" required onchange="toggleOptionsField()">
+            <option value="text">Текст</option>
+            <option value="textarea">Многострочный текст</option>
+            <option value="email">Email</option>
+            <option value="number">Число</option>
+            <option value="date">Дата</option>
+            <option value="checkbox">Чекбокс</option>
+            <option value="choice">Выбор из списка</option>
+            <option value="select">Выпадающий список</option>
+            <option value="radio">Радио кнопки</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="fieldName">Имя поля (ID) *</label>
+            <input type="text" id="fieldName" required placeholder="field_name">
+          </div>
+          <div class="input-group">
+            <label for="fieldLabel">Метка (Label)</label>
+            <input type="text" id="fieldLabel" placeholder="Отображаемое название">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="fieldDescription">Описание</label>
+          <textarea id="fieldDescription" placeholder="Подсказка для пользователя"></textarea>
+        </div>
+        <div class="input-group" id="optionsGroup" style="display: none;">
+          <label>Варианты ответа</label>
+          <div class="options-editor" id="optionsEditor">
+            <div class="option-item">
+              <input type="text" class="option-input" placeholder="Вариант 1">
+              <button type="button" class="icon-btn danger" onclick="removeOption(this)">✕</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addOption()" style="margin-top: 0.5rem;">
+            + Добавить вариант
+          </button>
+        </div>
+        <div class="input-group">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="fieldRequired">
+            <label for="fieldRequired" style="margin: 0;">Обязательное поле</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('fieldModal')">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_URL = '/api';
+    let currentFormId = null;
+    let forms = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadForms();
+      setupFormHandlers();
+    });
+
+    // Setup form handlers
+    function setupFormHandlers() {
+      document.getElementById('formForm').addEventListener('submit', handleFormSubmit);
+      document.getElementById('fieldForm').addEventListener('submit', handleFieldSubmit);
+    }
+
+    // Load all forms
+    async function loadForms() {
+      try {
+        const response = await fetch(`${API_URL}/forms`);
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || data.details || 'Ошибка сервера');
+        }
+        
+        forms = Array.isArray(data) ? data : [];
+        renderFormsList();
+      } catch (error) {
+        showToast('Ошибка загрузки форм: ' + error.message, 'error');
+        console.error(error);
+        forms = [];
+        renderFormsList();
+      }
+    }
+
+    // Render forms list
+    function renderFormsList() {
+      const container = document.getElementById('formsList');
+      
+      if (!Array.isArray(forms) || forms.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="height: auto; padding: 2rem 0;">
+            <p>Нет форм</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = forms.map(form => `
+        <div class="form-item ${currentFormId === form.id ? 'active' : ''}" 
+             onclick="selectForm(${form.id})">
+          <div class="form-item-title">
+            ${form.title}
+            <span class="form-item-status status-${form.status}">${form.status}</span>
+          </div>
+          <div class="form-item-meta">ID: ${form.id}</div>
+        </div>
+      `).join('');
+    }
+
+    // Select form for editing
+    async function selectForm(formId) {
+      currentFormId = formId;
+      renderFormsList();
+      
+      try {
+        const response = await fetch(`${API_URL}/forms/${formId}`);
+        const form = await response.json();
+        renderFormEditor(form);
+        loadResponsesCount(formId);
+      } catch (error) {
+        showToast('Ошибка загрузки формы', 'error');
+        console.error(error);
+      }
+    }
+
+    // Load responses count
+    async function loadResponsesCount(formId) {
+      try {
+        const response = await fetch(`${API_URL}/forms/${formId}/responses/count`);
+        const data = await response.json();
+        const countEl = document.getElementById('responsesCount');
+        if (countEl) {
+          countEl.textContent = data.count || 0;
+        }
+      } catch (error) {
+        console.error('Error loading responses count:', error);
+        const countEl = document.getElementById('responsesCount');
+        if (countEl) {
+          countEl.textContent = '—';
+        }
+      }
+    }
+
+    // Export to Excel
+    async function exportToExcel(formId) {
+      try {
+        showToast('Генерация Excel файла...', 'success');
+        
+        const response = await fetch(`${API_URL}/forms/${formId}/export`);
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || error.details || 'Export failed');
+        }
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Extract filename from Content-Disposition header or use default
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'responses.xlsx';
+        if (contentDisposition) {
+          const match = contentDisposition.match(/filename\*?=['"]?(?:UTF-8'')?([^;\n"']+)/i);
+          if (match) {
+            filename = decodeURIComponent(match[1]);
+          }
+        }
+        
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        
+        showToast('Excel файл скачан!', 'success');
+      } catch (error) {
+        showToast('Ошибка экспорта: ' + error.message, 'error');
+        console.error(error);
+      }
+    }
+
+    // Render form editor
+    function renderFormEditor(form) {
+      const container = document.getElementById('editorArea');
+      
+      container.innerHTML = `
+        <div class="form-editor-header">
+          <div class="form-editor-title-group">
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">${form.title}</h2>
+            <p style="color: var(--text-secondary);">
+              ${form.description || 'Нет описания'} • 
+              <span class="form-item-status status-${form.status}">${form.status}</span>
+            </p>
+          </div>
+          <div class="form-editor-actions">
+            <button class="btn btn-primary" onclick="exportToExcel(${form.id})" title="Экспорт ответов в Excel">
+              📊 Экспорт в Excel
+            </button>
+            <button class="btn btn-secondary" onclick="showEditFormModal(${form.id})">
+              ✏️ Редактировать
+            </button>
+            <button class="btn btn-danger" onclick="deleteForm(${form.id})">
+              🗑️ Удалить
+            </button>
+          </div>
+        </div>
+
+        <div class="responses-info" id="responsesInfo" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <span style="color: var(--text-secondary);">📝 Ответов: </span>
+          <span id="responsesCount">загрузка...</span>
+        </div>
+
+        <div class="fields-section">
+          <div class="fields-header">
+            <h3>Поля формы (${form.fields.length})</h3>
+            <button class="btn btn-primary btn-sm" onclick="showAddFieldModal(${form.id})">
+              + Добавить поле
+            </button>
+          </div>
+          <div class="fields-list" id="fieldsList">
+            ${renderFieldsList(form.fields)}
+          </div>
+        </div>
+      `;
+    }
+
+    // Render fields list
+    function renderFieldsList(fields) {
+      if (fields.length === 0) {
+        return `
+          <div class="empty-state" style="height: 150px;">
+            <p>Нет полей в форме</p>
+          </div>
+        `;
+      }
+      
+      return fields.map(field => `
+        <div class="field-card">
+          <div class="field-card-header">
+            <span class="field-type-badge">${getFieldTypeIcon(field.field_type)} ${field.field_type}</span>
+            <div class="field-card-actions">
+              <button class="icon-btn" onclick="showEditFieldModal(${field.id})" title="Редактировать">✏️</button>
+              <button class="icon-btn danger" onclick="deleteField(${field.id})" title="Удалить">🗑️</button>
+            </div>
+          </div>
+          <div class="field-info">
+            <div class="field-info-item">
+              <span>Имя: </span>
+              <span>${field.field_name}</span>
+            </div>
+            <div class="field-info-item">
+              <span>Метка: </span>
+              <span>${field.field_label || '—'}</span>
+            </div>
+            <div class="field-info-item">
+              <span>Обязательное: </span>
+              <span>${field.is_required ? '✅ Да' : '❌ Нет'}</span>
+            </div>
+            <div class="field-info-item">
+              <span>Позиция: </span>
+              <span>${field.position}</span>
+            </div>
+            ${field.field_options ? `
+              <div class="field-info-item" style="grid-column: 1 / -1;">
+                <span>Варианты: </span>
+                <span>${JSON.stringify(field.field_options)}</span>
+              </div>
+            ` : ''}
+            ${field.description ? `
+              <div class="field-info-item" style="grid-column: 1 / -1;">
+                <span>Описание: </span>
+                <span>${field.description}</span>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Get field type icon
+    function getFieldTypeIcon(type) {
+      const icons = {
+        text: '📝',
+        textarea: '📄',
+        email: '📧',
+        number: '🔢',
+        date: '📅',
+        checkbox: '☑️',
+        choice: '📋',
+        select: '📋',
+        radio: '🔘'
+      };
+      return icons[type] || '📌';
+    }
+
+    // Modal functions
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function showCreateFormModal() {
+      document.getElementById('formModalTitle').textContent = 'Создать форму';
+      document.getElementById('formForm').reset();
+      document.getElementById('formId').value = '';
+      showModal('formModal');
+    }
+
+    async function showEditFormModal(formId) {
+      try {
+        const response = await fetch(`${API_URL}/forms/${formId}`);
+        const form = await response.json();
+        
+        document.getElementById('formModalTitle').textContent = 'Редактировать форму';
+        document.getElementById('formId').value = form.id;
+        document.getElementById('formTitle').value = form.title;
+        document.getElementById('formDescription').value = form.description || '';
+        document.getElementById('formStatus').value = form.status;
+        
+        showModal('formModal');
+      } catch (error) {
+        showToast('Ошибка загрузки формы', 'error');
+      }
+    }
+
+    function showAddFieldModal(formId) {
+      document.getElementById('fieldModalTitle').textContent = 'Добавить поле';
+      document.getElementById('fieldForm').reset();
+      document.getElementById('fieldId').value = '';
+      document.getElementById('fieldFormId').value = formId;
+      document.getElementById('optionsGroup').style.display = 'none';
+      resetOptionsEditor();
+      showModal('fieldModal');
+    }
+
+    async function showEditFieldModal(fieldId) {
+      try {
+        // Find field in current form
+        const response = await fetch(`${API_URL}/forms/${currentFormId}`);
+        const form = await response.json();
+        const field = form.fields.find(f => f.id === fieldId);
+        
+        if (!field) {
+          showToast('Поле не найдено', 'error');
+          return;
+        }
+        
+        document.getElementById('fieldModalTitle').textContent = 'Редактировать поле';
+        document.getElementById('fieldId').value = field.id;
+        document.getElementById('fieldFormId').value = field.form_id;
+        document.getElementById('fieldType').value = field.field_type;
+        document.getElementById('fieldName').value = field.field_name;
+        document.getElementById('fieldLabel').value = field.field_label || '';
+        document.getElementById('fieldDescription').value = field.description || '';
+        document.getElementById('fieldRequired').checked = field.is_required;
+        
+        toggleOptionsField();
+        
+        if (field.field_options) {
+          setOptionsFromArray(field.field_options);
+        }
+        
+        showModal('fieldModal');
+      } catch (error) {
+        showToast('Ошибка загрузки поля', 'error');
+      }
+    }
+
+    // Toggle options field visibility
+    function toggleOptionsField() {
+      const type = document.getElementById('fieldType').value;
+      const optionsGroup = document.getElementById('optionsGroup');
+      const showOptions = ['choice', 'select', 'radio'].includes(type);
+      optionsGroup.style.display = showOptions ? 'block' : 'none';
+    }
+
+    // Options editor functions
+    function addOption() {
+      const editor = document.getElementById('optionsEditor');
+      const div = document.createElement('div');
+      div.className = 'option-item';
+      div.innerHTML = `
+        <input type="text" class="option-input" placeholder="Вариант">
+        <button type="button" class="icon-btn danger" onclick="removeOption(this)">✕</button>
+      `;
+      editor.appendChild(div);
+    }
+
+    function removeOption(btn) {
+      const items = document.querySelectorAll('.option-item');
+      if (items.length > 1) {
+        btn.parentElement.remove();
+      }
+    }
+
+    function resetOptionsEditor() {
+      const editor = document.getElementById('optionsEditor');
+      editor.innerHTML = `
+        <div class="option-item">
+          <input type="text" class="option-input" placeholder="Вариант 1">
+          <button type="button" class="icon-btn danger" onclick="removeOption(this)">✕</button>
+        </div>
+      `;
+    }
+
+    function setOptionsFromArray(options) {
+      const editor = document.getElementById('optionsEditor');
+      editor.innerHTML = options.map((opt, i) => `
+        <div class="option-item">
+          <input type="text" class="option-input" value="${opt}" placeholder="Вариант ${i + 1}">
+          <button type="button" class="icon-btn danger" onclick="removeOption(this)">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function getOptionsArray() {
+      const inputs = document.querySelectorAll('.option-input');
+      return Array.from(inputs)
+        .map(input => input.value.trim())
+        .filter(val => val !== '');
+    }
+
+    // Form submit handlers
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const formId = document.getElementById('formId').value;
+      const data = {
+        title: document.getElementById('formTitle').value,
+        description: document.getElementById('formDescription').value,
+        status: document.getElementById('formStatus').value
+      };
+      
+      try {
+        if (formId) {
+          await fetch(`${API_URL}/forms/${formId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          showToast('Форма обновлена', 'success');
+        } else {
+          const response = await fetch(`${API_URL}/forms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const newForm = await response.json();
+          currentFormId = newForm.id;
+          showToast('Форма создана', 'success');
+        }
+        
+        closeModal('formModal');
+        await loadForms();
+        if (currentFormId) {
+          selectForm(currentFormId);
+        }
+      } catch (error) {
+        showToast('Ошибка сохранения', 'error');
+      }
+    }
+
+    async function handleFieldSubmit(e) {
+      e.preventDefault();
+      
+      const fieldId = document.getElementById('fieldId').value;
+      const formId = document.getElementById('fieldFormId').value;
+      const fieldType = document.getElementById('fieldType').value;
+      
+      const data = {
+        field_type: fieldType,
+        field_name: document.getElementById('fieldName').value,
+        field_label: document.getElementById('fieldLabel').value,
+        description: document.getElementById('fieldDescription').value,
+        is_required: document.getElementById('fieldRequired').checked
+      };
+      
+      if (['choice', 'select', 'radio'].includes(fieldType)) {
+        data.field_options = getOptionsArray();
+      }
+      
+      try {
+        if (fieldId) {
+          await fetch(`${API_URL}/fields/${fieldId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          showToast('Поле обновлено', 'success');
+        } else {
+          await fetch(`${API_URL}/forms/${formId}/fields`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          showToast('Поле добавлено', 'success');
+        }
+        
+        closeModal('fieldModal');
+        selectForm(currentFormId);
+      } catch (error) {
+        showToast('Ошибка сохранения', 'error');
+      }
+    }
+
+    // Delete functions
+    async function deleteForm(formId) {
+      if (!confirm('Вы уверены, что хотите удалить эту форму? Все поля и ответы будут удалены.')) {
+        return;
+      }
+      
+      try {
+        await fetch(`${API_URL}/forms/${formId}`, { method: 'DELETE' });
+        showToast('Форма удалена', 'success');
+        currentFormId = null;
+        await loadForms();
+        document.getElementById('editorArea').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>Выберите форму для редактирования</h3>
+            <p>Или создайте новую форму</p>
+          </div>
+        `;
+      } catch (error) {
+        showToast('Ошибка удаления', 'error');
+      }
+    }
+
+    async function deleteField(fieldId) {
+      if (!confirm('Вы уверены, что хотите удалить это поле?')) {
+        return;
+      }
+      
+      try {
+        await fetch(`${API_URL}/fields/${fieldId}`, { method: 'DELETE' });
+        showToast('Поле удалено', 'success');
+        selectForm(currentFormId);
+      } catch (error) {
+        showToast('Ошибка удаления', 'error');
+      }
+    }
+
+    // Toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

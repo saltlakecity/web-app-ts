@@ -1,0 +1,13 @@
+services:
+  form-builder:
+    build: .
+    container_name: form_builder_app
+    environment:
+      # Directus API URL - измените на ваш сервер
+      DIRECTUS_URL: ${DIRECTUS_URL}
+      # Токен доступа к Directus API
+      DIRECTUS_TOKEN: ${DIRECTUS_TOKEN}
+      PORT: 4000
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
