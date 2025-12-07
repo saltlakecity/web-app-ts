@@ -48,6 +48,7 @@ services:
       - backend
     networks:
       - shared
+    restart: unless-stopped
   nginx:
     image: nginx:alpine
     ports:

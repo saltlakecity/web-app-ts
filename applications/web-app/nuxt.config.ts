@@ -39,6 +39,18 @@ export default defineNuxtConfig({
     },
   },
 
+  // Проксирование в production режиме через routeRules (опционально)
+  // Если не используется, то запросы будут идти напрямую к API_URL
+  routeRules:
+    process.env.BACKEND_APP_URL && process.env.NODE_ENV === "production"
+      ? {
+          "/api/**": {
+            proxy: `${process.env.BACKEND_APP_URL}/api/**`,
+            cors: true,
+          },
+        }
+      : {},
+
   // Настройки CSS
   css: ["~/assets/css/main.css"],
 
