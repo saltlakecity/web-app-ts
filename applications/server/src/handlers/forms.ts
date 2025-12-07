@@ -10,7 +10,7 @@ import { router, protectedProcedure } from "../middleware/auth";
 async function fetchForms(userId: number) {
   // Получаем все формы
   const formsRes = await pool.query(
-    "SELECT id, title, status FROM forms ORDER BY id"
+    "SELECT id, title, description, status FROM forms ORDER BY id"
   );
 
   // Получаем ID форм, на которые уже отвечал пользователь
@@ -43,7 +43,7 @@ async function fetchFormFields(formId: number) {
 
 async function fetchFormMeta(formId: number, userId: number) {
   const res = await pool.query(
-    "SELECT id, title, status FROM forms WHERE id = $1",
+    "SELECT id, title, description, status FROM forms WHERE id = $1",
     [formId]
   );
 
@@ -80,12 +80,12 @@ export async function saveResponse(
   const client = await pool.connect();
   try {
     const { rows: allowedFields } = await client.query(
-      "SELECT id, is_required as required FROM form_fields WHERE form_id = $1",
+      "SELECT id, field_type, is_required as required FROM form_fields WHERE form_id = $1",
       [formId]
     );
-    const allowedMap = new Map<string, { required: boolean }>();
+    const allowedMap = new Map<string, { required: boolean; type: string }>();
     for (const r of allowedFields)
-      allowedMap.set(String(r.id), { required: !!r.required });
+      allowedMap.set(String(r.id), { required: !!r.required, type: r.field_type });
 
     // Валидация: все поля должны принадлежать форме
     for (const a of answers) {
@@ -93,8 +93,11 @@ export async function saveResponse(
         throw new Error(`Field ${a.fieldId} does not belong to form ${formId}`);
       }
     }
-    // Валидация: обязательные поля должны быть заполнены
+    // Валидация: обязательные поля должны быть заполнены (исключая section_header)
     for (const [fieldId, meta] of allowedMap.entries()) {
+      // Пропускаем заголовки секций - они не требуют заполнения
+      if (meta.type === 'section_header') continue;
+      
       if (meta.required) {
         const found = answers.find((x) => x.fieldId === fieldId);
         if (

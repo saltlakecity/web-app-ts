@@ -6,6 +6,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["back"]);
 
+const router = useRouter();
 const formIdRef = computed(() => props.formId);
 const { formFields, isLoading, error } = useFormFields(formIdRef);
 const {
@@ -14,6 +15,11 @@ const {
   error: metaError,
 } = useFormMeta(formIdRef);
 const { submitFormResponse, isSubmitting, submitError } = useFormSubmit();
+
+// Фильтруем поля, исключая section_header (они только для отображения)
+const inputFields = computed(() => 
+  formFields.value.filter(f => f.type !== 'section_header')
+);
 
 const formTitle = computed(
   () => formMeta.value?.title || `Форма #${props.formId}`
@@ -28,6 +34,9 @@ watch(
   (fields) => {
     if (fields) {
       for (const f of fields) {
+        // Пропускаем заголовки секций - они не требуют ввода
+        if (f.type === 'section_header') continue;
+        
         const id = String(f.id);
         if (!(id in values)) {
           values[id] = "";
@@ -43,7 +52,8 @@ function validate(): boolean {
   let ok = true;
   for (const k of Object.keys(fieldErrors)) fieldErrors[k] = null;
 
-  for (const f of formFields.value) {
+  // Валидируем только обычные поля (не section_header)
+  for (const f of inputFields.value) {
     if (f.required) {
       const id = String(f.id);
       const val = (values[id] ?? "").trim();
@@ -62,7 +72,8 @@ async function handleSubmit() {
 
   if (!validate()) return;
 
-  const answers = formFields.value.map((f) => {
+  // Отправляем только обычные поля (не section_header)
+  const answers = inputFields.value.map((f) => {
     const id = String(f.id);
     const trimmed = (values[id] ?? "").trim();
     return {
@@ -73,17 +84,25 @@ async function handleSubmit() {
 
   try {
     await submitFormResponse(props.formId, answers);
-    successMessage.value = "Ответ успешно отправлен. Спасибо!";
-
-    for (const f of formFields.value) {
+    
+    // Очищаем форму
+    for (const f of inputFields.value) {
       values[String(f.id)] = "";
     }
+    
+    // Перенаправляем на главный экран после успешной отправки
+    router.push('/');
   } catch {
     // Ошибка уже в submitError
   }
 }
 
 const handleBack = () => emit("back");
+
+// Динамический отступ формы в зависимости от наличия description
+const formTopOffset = computed(() => 
+  formMeta.value?.description ? 'calc(23vh + 90px)' : 'calc(23vh + 50px)'
+);
 </script>
 
 <template>
@@ -92,56 +111,73 @@ const handleBack = () => emit("back");
       <h1 class="form-detail__title">{{ formTitle }}</h1>
     </div>
 
+    <div class="form-detail__nav">
+      <button @click="handleBack" class="form-detail__back-btn">←</button>
+    </div>
+
+    <div v-if="formMeta?.description" class="form-detail__description">
+      {{ formMeta.description }}
+    </div>
+
     <form @submit.prevent="handleSubmit" class="form-detail__form">
       <div v-if="isLoading" class="form-detail__loading">Загрузка...</div>
 
       <div v-else class="form-detail__content">
-         <button @click="handleBack" class="form-detail__back-btn">←</button>
-        <div
-          v-for="field in formFields"
-          :key="field.id"
-          class="form-field"
-          :class="{ 'form-field--error': fieldErrors[String(field.id)] }"
-        >
-          <label :for="field.id.toString()" class="form-field__label">
-            {{ field.label }}
-            <span v-if="field.required" class="form-field__required">*</span>
-          </label>
-
-          <div v-if="field.description" class="form-field__description">
-            {{ field.description }}
+        <!-- Секционный заголовок -->
+        <template v-for="field in formFields" :key="field.id">
+          <div v-if="field.type === 'section_header'" class="form-section-header">
+            <h2 class="form-section-header__title">{{ field.label }}</h2>
+            <p v-if="field.description" class="form-section-header__description">
+              {{ field.description }}
+            </p>
           </div>
-
-          <input
-            v-if="field.type === 'text'"
-            :id="field.id.toString()"
-            v-model="values[String(field.id)]"
-            :required="field.required"
-            type="text"
-            class="form-field__input"
-          />
-
-          <select
-            v-else-if="field.type === 'choice'"
-            :id="field.id.toString()"
-            v-model="values[String(field.id)]"
-            :required="field.required"
-            class="form-field__select"
+          
+          <!-- Обычное поле -->
+          <div
+            v-else
+            class="form-field"
+            :class="{ 'form-field--error': fieldErrors[String(field.id)] }"
           >
-            <option value="">Выберите вариант</option>
-            <option
-              v-for="option in field.options"
-              :key="option"
-              :value="option"
-            >
-              {{ option }}
-            </option>
-          </select>
+            <label :for="field.id.toString()" class="form-field__label">
+              {{ field.label }}
+              <span v-if="field.required" class="form-field__required">*</span>
+            </label>
 
-          <div v-if="fieldErrors[String(field.id)]" class="form-field__error">
-            {{ fieldErrors[String(field.id)] }}
+            <div v-if="field.description" class="form-field__description">
+              {{ field.description }}
+            </div>
+
+            <input
+              v-if="field.type === 'text'"
+              :id="field.id.toString()"
+              v-model="values[String(field.id)]"
+              :required="field.required"
+              type="text"
+              class="form-field__input"
+            />
+
+            <select
+              v-else-if="field.type === 'choice'"
+              :id="field.id.toString()"
+              v-model="values[String(field.id)]"
+              :required="field.required"
+              class="form-field__select"
+            >
+              <option value="">Выберите вариант</option>
+              <option
+                v-for="option in field.options"
+                :key="option"
+                :value="option"
+              >
+                {{ option }}
+              </option>
+            </select>
+
+            <div v-if="fieldErrors[String(field.id)]" class="form-field__error">
+              {{ fieldErrors[String(field.id)] }}
+            </div>
           </div>
-        </div>
+        </template>
 
         <div class="form-detail__actions">
           <button
@@ -185,48 +221,77 @@ const handleBack = () => emit("back");
   padding: 0;
   width: 100%;
   background-color: white;
-  &__back-btn {
-    @include button-transparent;
-    font-size: 1rem;
-    color: $color-text-primary;
-    padding: $spacing-sm 0;
-    top: 5px;
-    left: 10px;
-    font-size: 32px;
-    z-index: 9999;
-    position: fixed;
 
-  }
   &__header {
     text-align: center;
-    margin-bottom: 120px;
     background-image: url("/Top.svg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     width: 100%;
+    height: $header-height;
     position: absolute;
+    top: 0;
+    left: 0;
     font-size: 14px;
     display: flex;
-    // flex-direction: row;
     justify-content: center;
     align-items: center;
   }
+
   &__title {
-    color: $color-text-primary;
     font-weight: 300;
     text-align: center;
     font-family: "MyFont", sans-serif;
     color: white;
   }
 
+  &__nav {
+    position: absolute;
+    top: $header-height;
+    left: 0;
+    width: 100%;
+    padding: $spacing-sm $spacing-base;
+    box-sizing: border-box;
+    z-index: 100;
+  }
+
+  &__back-btn {
+    @include button-transparent;
+    font-size: 24px;
+    color: $color-text-primary;
+    padding: $spacing-xs;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      color: #881014;
+    }
+  }
+
+  &__description {
+    position: absolute;
+    top: calc(#{$header-height} + 48px);
+    left: 0;
+    width: 100%;
+    padding: 0 $spacing-base;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    text-align: center;
+  }
+
   &__form {
     width: 100%;
     position: absolute;
-    margin-top: 120px;
+    top: v-bind(formTopOffset);
+    left: 0;
+    display: flex;
     align-items: center;
     justify-content: center;
-    display: flex;
+    padding-bottom: $spacing-xxl;
   }
 
   &__loading {
@@ -342,6 +407,28 @@ const handleBack = () => emit("back");
 
   &--error &__input {
     border-color: $color-border-error;
+  }
+}
+
+.form-section-header {
+  margin: $spacing-lg 0 $spacing-base;
+  padding-bottom: $spacing-sm;
+  border-bottom: 2px solid #881014;
+
+  &__title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-xs;
+  }
+
+  &__description {
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.85rem;
+    color: $color-text-secondary;
+    margin: 0;
+    line-height: 1.4;
   }
 }
 </style>

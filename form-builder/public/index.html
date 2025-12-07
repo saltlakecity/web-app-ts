@@ -345,6 +345,24 @@
       border-color: var(--accent);
     }
 
+    .field-card--section {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .field-card--section:hover {
+      border-color: rgba(168, 85, 247, 0.5);
+    }
+
+    .field-type-badge--section {
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      color: white;
+    }
+
+    .section-header-preview {
+      padding: 0.5rem 0;
+    }
+
     .field-card-header {
       display: flex;
       justify-content: space-between;
@@ -626,6 +644,7 @@
         <div class="input-group">
           <label for="fieldType">Тип поля *</label>
           <select id="fieldType" required onchange="toggleOptionsField()">
+            <option value="section_header">📌 Заголовок секции</option>
             <option value="text">Текст</option>
             <option value="textarea">Многострочный текст</option>
             <option value="email">Email</option>
@@ -871,52 +890,64 @@
         `;
       }
       
-      return fields.map(field => `
-        <div class="field-card">
-          <div class="field-card-header">
-            <span class="field-type-badge">${getFieldTypeIcon(field.field_type)} ${field.field_type}</span>
-            <div class="field-card-actions">
-              <button class="icon-btn" onclick="showEditFieldModal(${field.id})" title="Редактировать">✏️</button>
-              <button class="icon-btn danger" onclick="deleteField(${field.id})" title="Удалить">🗑️</button>
-            </div>
-          </div>
-          <div class="field-info">
-            <div class="field-info-item">
-              <span>Имя: </span>
-              <span>${field.field_name}</span>
-            </div>
-            <div class="field-info-item">
-              <span>Метка: </span>
-              <span>${field.field_label || '—'}</span>
-            </div>
-            <div class="field-info-item">
-              <span>Обязательное: </span>
-              <span>${field.is_required ? '✅ Да' : '❌ Нет'}</span>
-            </div>
-            <div class="field-info-item">
-              <span>Позиция: </span>
-              <span>${field.position}</span>
-            </div>
-            ${field.field_options ? `
-              <div class="field-info-item" style="grid-column: 1 / -1;">
-                <span>Варианты: </span>
-                <span>${JSON.stringify(field.field_options)}</span>
+      return fields.map(field => {
+        const isSectionHeader = field.field_type === 'section_header';
+        
+        return `
+          <div class="field-card ${isSectionHeader ? 'field-card--section' : ''}">
+            <div class="field-card-header">
+              <span class="field-type-badge ${isSectionHeader ? 'field-type-badge--section' : ''}">${getFieldTypeIcon(field.field_type)} ${isSectionHeader ? 'ЗАГОЛОВОК' : field.field_type}</span>
+              <div class="field-card-actions">
+                <button class="icon-btn" onclick="showEditFieldModal(${field.id})" title="Редактировать">✏️</button>
+                <button class="icon-btn danger" onclick="deleteField(${field.id})" title="Удалить">🗑️</button>
               </div>
-            ` : ''}
-            ${field.description ? `
-              <div class="field-info-item" style="grid-column: 1 / -1;">
-                <span>Описание: </span>
-                <span>${field.description}</span>
+            </div>
+            ${isSectionHeader ? `
+              <div class="section-header-preview">
+                <h4 style="margin: 0 0 4px; color: var(--text-primary);">${field.field_label || 'Без названия'}</h4>
+                ${field.description ? `<p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">${field.description}</p>` : ''}
               </div>
-            ` : ''}
+            ` : `
+              <div class="field-info">
+                <div class="field-info-item">
+                  <span>Имя: </span>
+                  <span>${field.field_name}</span>
+                </div>
+                <div class="field-info-item">
+                  <span>Метка: </span>
+                  <span>${field.field_label || '—'}</span>
+                </div>
+                <div class="field-info-item">
+                  <span>Обязательное: </span>
+                  <span>${field.is_required ? '✅ Да' : '❌ Нет'}</span>
+                </div>
+                <div class="field-info-item">
+                  <span>Позиция: </span>
+                  <span>${field.position}</span>
+                </div>
+                ${field.field_options ? `
+                  <div class="field-info-item" style="grid-column: 1 / -1;">
+                    <span>Варианты: </span>
+                    <span>${JSON.stringify(field.field_options)}</span>
+                  </div>
+                ` : ''}
+                ${field.description ? `
+                  <div class="field-info-item" style="grid-column: 1 / -1;">
+                    <span>Описание: </span>
+                    <span>${field.description}</span>
+                  </div>
+                ` : ''}
+              </div>
+            `}
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // Get field type icon
     function getFieldTypeIcon(type) {
       const icons = {
+        section_header: '📌',
         text: '📝',
         textarea: '📄',
         email: '📧',
@@ -1010,8 +1041,24 @@
     function toggleOptionsField() {
       const type = document.getElementById('fieldType').value;
       const optionsGroup = document.getElementById('optionsGroup');
+      const requiredGroup = document.getElementById('fieldRequired').parentElement.parentElement;
+      const fieldNameGroup = document.getElementById('fieldName').parentElement.parentElement;
+      
+      // Показываем варианты только для типов с выбором
       const showOptions = ['choice', 'select', 'radio'].includes(type);
       optionsGroup.style.display = showOptions ? 'block' : 'none';
+      
+      // Для заголовков секций скрываем "обязательное поле" и делаем имя опциональным
+      const isSectionHeader = type === 'section_header';
+      requiredGroup.style.display = isSectionHeader ? 'none' : 'block';
+      
+      // Автозаполняем имя для заголовка секции
+      if (isSectionHeader) {
+        const fieldName = document.getElementById('fieldName');
+        if (!fieldName.value) {
+          fieldName.value = 'section_' + Date.now();
+        }
+      }
     }
 
     // Options editor functions

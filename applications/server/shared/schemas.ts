@@ -6,6 +6,7 @@ import { z } from 'zod';
 export const FormMetaSchema = z.object({
   id: z.number(),
   title: z.string(),
+  description: z.string().optional().nullable(),
   status: z.string().optional(),
   user_status: z.string().optional(), // completed, not_completed
 });
